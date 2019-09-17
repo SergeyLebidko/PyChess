@@ -19,9 +19,6 @@ def start():
     figures.append(Queen(3, 0))
 
     while True:
-        draw_board(display_surface, selected_cell, figures)
-        pygame.display.update()
-
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.QUIT:
@@ -32,11 +29,15 @@ def start():
                 # Тестовый код
                 figures[-1].set_pos(selected_cell[1], selected_cell[0])
 
+        draw_board(display_surface)
+        draw_selected_cell(display_surface, selected_cell)
+        draw_figures(display_surface, selected_cell)
+        pygame.display.update()
+
         clock.tick(FPS)
 
 
-def draw_board(surface, selected_cell, figures):
-    # Отрисовываем доску
+def draw_board(surface):
     for r in range(0, 8):
         for c in range(0, 8):
             if (r + c) % 2 == 0:
@@ -45,12 +46,14 @@ def draw_board(surface, selected_cell, figures):
                 color = BLACK_CELL_COLOR
             pygame.draw.rect(surface, color, (c * CELL_SIZE, r * CELL_SIZE, CELL_SIZE, CELL_SIZE))
 
-    # Если есть выделенная клетка, то отрисовываем её
+
+def draw_selected_cell(surface, selected_cell):
     if selected_cell:
         pygame.draw.rect(surface, SELECTED_CELL_COLOR,
                          (selected_cell[1] * CELL_SIZE, selected_cell[0] * CELL_SIZE, CELL_SIZE, CELL_SIZE), 3)
 
-    # Отрисовываем список фигур
+
+def draw_figures(surface, figures):
     for figure in figures:
         surface.blit(figure.image, figure.rect)
 
