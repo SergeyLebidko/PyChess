@@ -52,6 +52,7 @@ class Board:
 
         pass
 
+    # Метод возвращает фигуру, стоящую на клетке r, c
     def get_figure(self, r, c):
         for figure in self.player_figures:
             if figure.row == r and figure.col == c:
@@ -60,3 +61,11 @@ class Board:
             if figure.row == r and figure.col == c:
                 return figure
         return None
+
+    # Метод возвращает список ходов, доступных фигуре figure
+    def get_moves(self, figure):
+        pass
+
+    # Метод определяет список взятий, которые может совершить фигура figure
+    def get_takes(self, figure):
+        pass

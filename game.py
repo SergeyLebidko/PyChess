@@ -10,27 +10,30 @@ def start(player_side):
     clock = pygame.time.Clock()
 
     # Выделенная пользователем клетка
-    selected_cell = ()
+    selected_figure = None
 
-    # Список фигур на доске
+    # Создаем текущее игровое поле
     board = Board(player_side)
 
     while True:
+        # Обрабатываем события
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.QUIT:
                 exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                selected_cell = mouse_handler(event)
+                selected_figure = mouse_handler(event, board)
 
+        # Блок команд отрисовки
         draw_cells(display_surface)
-        draw_select_frame(display_surface, selected_cell)
         draw_figures(display_surface, board)
+        draw_select_frame(display_surface, selected_figure)
         pygame.display.update()
 
         clock.tick(FPS)
 
 
+# Метод отрисовывает клетки доски
 def draw_cells(surface):
     for r in range(0, 8):
         for c in range(0, 8):
@@ -41,12 +44,14 @@ def draw_cells(surface):
             pygame.draw.rect(surface, color, (c * CELL_SIZE, r * CELL_SIZE, CELL_SIZE, CELL_SIZE))
 
 
-def draw_select_frame(surface, selected_cell):
-    if selected_cell:
+# Метод отрисовывает рамку вокруг выбранной игроком фигуры
+def draw_select_frame(surface, selected_figure):
+    if selected_figure:
         pygame.draw.rect(surface, SELECTED_CELL_COLOR,
-                         (selected_cell[1] * CELL_SIZE, selected_cell[0] * CELL_SIZE, CELL_SIZE, CELL_SIZE), 3)
+                         (selected_figure.col * CELL_SIZE, selected_figure.row * CELL_SIZE, CELL_SIZE, CELL_SIZE), 3)
 
 
+# Метод отрисовывает фигуры на доске
 def draw_figures(surface, board):
     for row in range(0, 8):
         for col in range(0, 8):
@@ -56,9 +61,11 @@ def draw_figures(surface, board):
             surface.blit(figure.image, figure.rect)
 
 
-def mouse_handler(mouse_event):
+# Метод определяет фигуру, которую выбрал игрок
+def mouse_handler(mouse_event, board):
     if mouse_event.button != 1:
         return
     c = mouse_event.pos[0] // CELL_SIZE
     r = mouse_event.pos[1] // CELL_SIZE
-    return r, c
+    figure = board.get_figure(r, c)
+    return figure
