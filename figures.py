@@ -18,6 +18,13 @@ class Figure(pygame.sprite.Sprite):
         self.rect.left = r * CELL_SIZE
         self.rect.top = c * CELL_SIZE
 
+    @staticmethod
+    def is_valid_pos(r, c):
+        if 0 <= r <= 7 and 0 <= c <= 7:
+            return True
+        else:
+            return False
+
 
 class King(Figure):
 
@@ -65,8 +72,48 @@ class Pawn(Figure):
 
     # Метод возвращает список клеток, на которые может пойти пешка
     def get_moves(self, board):
-        pass
+        moves = []
 
-    # Метод возвращает список взятий, которые может совершить пешка
+        # Проверяем возможность хода на две клетки вперед
+        if not self.was_move:
+            if board.get_figure(self.row + self.direction, self.col) is None:
+                if board.get_figure(self.row + 2 * self.direction, self.col) is None:
+                    moves.append((self.row + 2 * self.direction, self.col))
+
+        # Проверяем возможность хода на одну клетку вперед
+        if board.get_figure(self.row + self.direction, self.col) is None:
+            moves.append((self.row + self.direction, self.col))
+
+        # Возвращаем результат
+        return moves
+
+    # Метод возвращает список взятий, которые может совершить пешка (исключая взятия на проходе)
     def get_takes(self, board):
-        pass
+        takes = []
+
+        r1 = self.row + self.direction
+        c1 = self.col - 1
+        r2 = self.row + self.direction
+        c2 = self.col + 1
+
+        # Проверяем взятие влево
+        if self.is_valid_pos(r1, c1):
+            figure = board.get_figure(r1, c1)
+            if figure is not None:
+                if figure.side != self.side:
+                    takes.append((r1, c1))
+
+        # Проверяем взятие вправо
+        if self.is_valid_pos(r2, c2):
+            figure = board.get_figure(r2, c2)
+            if figure is not None:
+                if figure.side != self.side:
+                    takes.append((r2, c2))
+
+        # Возвращаем результат
+        return takes
+
+    # Переопределение метода перемещения необходимо для того, чтобы исключить возможность повторного хода на две клетки
+    def set_pos(self, r, c):
+        super().set_pos(r, c)
+        self.was_move = True
