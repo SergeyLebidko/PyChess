@@ -1,4 +1,4 @@
-FPS = 60
+FPS = 30
 
 WHITE = 'white'
 BLACK = 'black'

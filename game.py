@@ -22,7 +22,7 @@ def start(player_side):
             if event.type == pygame.QUIT:
                 exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                selected_figure = mouse_handler(event, board)
+                selected_figure = get_mouse_selected_figure(event, board)
 
         # Блок команд отрисовки
         draw_cells(display_surface)
@@ -33,7 +33,7 @@ def start(player_side):
         clock.tick(FPS)
 
 
-# Метод отрисовывает клетки доски
+# Функция отрисовывает клетки доски
 def draw_cells(surface):
     for r in range(0, 8):
         for c in range(0, 8):
@@ -44,14 +44,14 @@ def draw_cells(surface):
             pygame.draw.rect(surface, color, (c * CELL_SIZE, r * CELL_SIZE, CELL_SIZE, CELL_SIZE))
 
 
-# Метод отрисовывает рамку вокруг выбранной игроком фигуры
+# Функция отрисовывает рамку вокруг выбранной игроком фигуры
 def draw_select_frame(surface, selected_figure):
     if selected_figure:
         pygame.draw.rect(surface, SELECTED_CELL_COLOR,
                          (selected_figure.col * CELL_SIZE, selected_figure.row * CELL_SIZE, CELL_SIZE, CELL_SIZE), 3)
 
 
-# Метод отрисовывает фигуры на доске
+# Функция отрисовывает фигуры на доске
 def draw_figures(surface, board):
     for row in range(0, 8):
         for col in range(0, 8):
@@ -61,11 +61,19 @@ def draw_figures(surface, board):
             surface.blit(figure.image, figure.rect)
 
 
-# Метод определяет фигуру, которую выбрал игрок
-def mouse_handler(mouse_event, board):
+# Функция определяет клетку, которую выбрал игрок
+def get_mouse_selected_cell(mouse_event):
     if mouse_event.button != 1:
-        return
+        return None
     c = mouse_event.pos[0] // CELL_SIZE
     r = mouse_event.pos[1] // CELL_SIZE
-    figure = board.get_figure(r, c)
+    return r, c
+
+
+# Функция определяет фигуру, которую выбрал игрок
+def get_mouse_selected_figure(mouse_event, board):
+    selected_cell = get_mouse_selected_cell(mouse_event)
+    if not selected_cell:
+        return None
+    figure = board.get_figure(selected_cell[0], selected_cell[1])
     return figure
