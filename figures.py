@@ -18,7 +18,43 @@ class Figure(pygame.sprite.Sprite):
         self.rect.top = c * CELL_SIZE
 
 
+class King(Figure):
+
+    def __init__(self, r, c, side):
+        Figure.__init__(self, 'sprites/' + side + 'King.png', r, c)
+        self.side = side
+
+
 class Queen(Figure):
 
-    def __init__(self, r, c):
-        Figure.__init__(self, 'sprites/whiteQueen.png', r, c)
+    def __init__(self, r, c, side):
+        Figure.__init__(self, 'sprites/' + side + 'Queen.png', r, c)
+        self.side = side
+
+
+class Rook(Figure):
+
+    def __init__(self, r, c, side):
+        Figure.__init__(self, 'sprites/' + side + 'Rook.png', r, c)
+        self.side = side
+
+
+class Bishop(Figure):
+
+    def __init__(self, r, c, side):
+        Figure.__init__(self, 'sprites/' + side + 'Bishop.png', r, c)
+        self.side = side
+
+
+class Knight(Figure):
+
+    def __init__(self, r, c, side):
+        Figure.__init__(self, 'sprites/' + side + 'Knight.png', r, c)
+        self.side = side
+
+
+class Pawn(Figure):
+
+    def __init__(self, r, c, side):
+        Figure.__init__(self, 'sprites/' + side + 'Pawn.png', r, c)
+        self.side = side

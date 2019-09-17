@@ -1,3 +1,3 @@
 import game
 
-game.start()
+game.start('white')
