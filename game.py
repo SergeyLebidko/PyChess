@@ -1,5 +1,5 @@
 import pygame
-from params import *
+from params import FPS, WHITE_CELL_COLOR, BLACK_CELL_COLOR, SELECTED_CELL_COLOR, CELL_SIZE
 from board import Board
 
 
