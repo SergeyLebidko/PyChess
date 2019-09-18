@@ -32,7 +32,7 @@ class King(Figure):
     def __init__(self, r, c, side):
         Figure.__init__(self, 'sprites/' + side + 'King.png', r, c, side)
 
-    # Метод возвращает доступные ходы, взятия или защиты
+    # Метод возвращает доступные ходы (за исключением рокировки), взятия или защиты
     def get_actions(self, board, option):
         result = []
         offsets = [(-1, 0), (0, 1), (1, 0), (0, 1), (-1, 1), (1, 1), (1, -1), (-1, -1)]
@@ -126,7 +126,7 @@ class Rook(Figure):
     def __init__(self, r, c, side):
         Figure.__init__(self, 'sprites/' + side + 'Rook.png', r, c, side)
 
-    # Метод возвращает доступные ходы, взятия или защиты
+    # Метод возвращает доступные ходы (за исключением рокировки), взятия или защиты
     def get_actions(self, board, option):
         result = []
         offsets = [(-1, 0), (0, 1), (1, 0), (0, 1)]
