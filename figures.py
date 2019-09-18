@@ -50,6 +50,49 @@ class Bishop(Figure):
     def __init__(self, r, c, side):
         Figure.__init__(self, 'sprites/' + side + 'Bishop.png', r, c, side)
 
+    # Метод возвращает доступные ходы, взятия или защиты
+    def get_actions(self, board, option):
+        result = []
+        offsets = [(-1, 1), (1, 1), (1, -1), (-1, -1)]
+
+        for offset in offsets:
+            mul = 0
+            while True:
+                mul += 1
+                r1 = self.row + mul * offset[0]
+                c1 = self.col + mul * offset[1]
+                if not self.is_valid_pos(r1, c1):
+                    break
+                figure = board.get_figure(r1, c1)
+
+                # Если ищем простые ходы
+                if option == MOVES:
+                    if figure is None:
+                        result.append((r1, c1))
+                        continue
+                    break
+
+                # Если ещем защиты
+                if option == DEFENSE:
+                    if figure is None:
+                        continue
+                    if figure.side != self.side:
+                        break
+                    result.append((r1, c1))
+                    break
+
+                # Если ищем взятия
+                if option == TAKES:
+                    if figure is None:
+                        continue
+                    if figure.side == self.side:
+                        break
+                    result.append((r1, c1))
+                    break
+
+        # Возвращаем результат
+        return result
+
 
 class Knight(Figure):
 
