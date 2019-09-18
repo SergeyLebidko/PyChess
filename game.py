@@ -44,13 +44,6 @@ def draw_cells(surface):
             pygame.draw.rect(surface, color, (c * CELL_SIZE, r * CELL_SIZE, CELL_SIZE, CELL_SIZE))
 
 
-# Функция отрисовывает рамку вокруг выбранной игроком фигуры
-def draw_select_frame(surface, selected_figure):
-    if selected_figure:
-        pygame.draw.rect(surface, SELECTED_CELL_COLOR,
-                         (selected_figure.col * CELL_SIZE, selected_figure.row * CELL_SIZE, CELL_SIZE, CELL_SIZE), 3)
-
-
 # Функция отрисовывает фигуры на доске
 def draw_figures(surface, board):
     for row in range(0, 8):
@@ -59,6 +52,13 @@ def draw_figures(surface, board):
             if figure is None:
                 continue
             surface.blit(figure.image, figure.rect)
+
+
+# Функция отрисовывает рамку вокруг выбранной игроком фигуры
+def draw_select_frame(surface, selected_figure):
+    if selected_figure:
+        pygame.draw.rect(surface, SELECTED_CELL_COLOR,
+                         (selected_figure.col * CELL_SIZE, selected_figure.row * CELL_SIZE, CELL_SIZE, CELL_SIZE), 3)
 
 
 # Функция определяет клетку, которую выбрал игрок
@@ -72,8 +72,8 @@ def get_mouse_selected_cell(mouse_event):
 
 # Функция определяет фигуру, которую выбрал игрок
 def get_mouse_selected_figure(mouse_event, board):
-    selected_cell = get_mouse_selected_cell(mouse_event)
-    if not selected_cell:
+    cell = get_mouse_selected_cell(mouse_event)
+    if not cell:
         return None
-    figure = board.get_figure(selected_cell[0], selected_cell[1])
+    figure = board.get_figure(cell[0], cell[1])
     return figure

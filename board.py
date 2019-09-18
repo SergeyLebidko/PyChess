@@ -54,10 +54,7 @@ class Board:
 
     # Метод возвращает фигуру, стоящую на клетке r, c
     def get_figure(self, r, c):
-        for figure in self.player_figures:
-            if figure.row == r and figure.col == c:
-                return figure
-        for figure in self.computer_figures:
-            if figure.row == r and figure.col == c:
+        for figure in (self.player_figures + self.computer_figures):
+            if figure.row == r and figure.col == c and not figure.is_drop:
                 return figure
         return None

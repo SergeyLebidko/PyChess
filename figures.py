@@ -11,6 +11,7 @@ class Figure(pygame.sprite.Sprite):
         self.row = r
         self.col = c
         self.side = side
+        self.is_drop = False
 
     def set_pos(self, r, c):
         self.row = r
