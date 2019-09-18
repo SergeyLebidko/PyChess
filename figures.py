@@ -32,6 +32,45 @@ class King(Figure):
     def __init__(self, r, c, side):
         Figure.__init__(self, 'sprites/' + side + 'King.png', r, c, side)
 
+    # Метод возвращает доступные ходы, взятия или защиты
+    def get_actions(self, board, option):
+        result = []
+        offsets = [(-1, 0), (0, 1), (1, 0), (0, 1), (-1, 1), (1, 1), (1, -1), (-1, -1)]
+
+        for offset in offsets:
+            r1 = self.row + offset[0]
+            c1 = self.col + offset[1]
+            if not self.is_valid_pos(r1, c1):
+                continue
+            figure = board.get_figure(r1, c1)
+
+            # Ищем простые ходы
+            if option == MOVES:
+                if figure is None:
+                    result.append((r1, c1))
+                    continue
+
+            # Ищем защиты
+            if option == DEFENSE:
+                if figure is None:
+                    continue
+                if figure.side != self.side:
+                    continue
+                result.append((r1, c1))
+                continue
+
+            # Ищем взятия
+            if option == TAKES:
+                if figure is None:
+                    continue
+                if figure.side == self.side:
+                    continue
+                result.append((r1, c1))
+                continue
+
+        # Возвращаем результат
+        return result
+
 
 class Queen(Figure):
 
