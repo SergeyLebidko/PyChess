@@ -1,5 +1,5 @@
 import pygame
-from params import CELL_SIZE
+from params import CELL_SIZE, MOVES, TAKES, DEFENSE
 
 
 class Figure(pygame.sprite.Sprite):
@@ -56,6 +56,27 @@ class Knight(Figure):
     def __init__(self, r, c, side):
         Figure.__init__(self, 'sprites/' + side + 'Knight.png', r, c, side)
 
+    def get_actions(self, board, option):
+        result = []
+
+        offsets = [(-2, 1), (-1, 2), (1, 2), (2, 1), (2, -1), (1, -2), (-1, -2), (-2, -1)]
+        for offset in offsets:
+            r1 = self.row + offset[0]
+            c1 = self.col + offset[1]
+            if not self.is_valid_pos(r1, c1):
+                continue
+            figure = board.get_figure(r1, c1)
+            if figure is None and option == MOVES:
+                result.append((r1, c1))
+                continue
+            if figure is not None:
+                if figure.side == self.side and option == DEFENSE:
+                    result.append((r1, c1))
+                    continue
+                if figure.side != self.side and option == TAKES:
+                    result.append((r1, c1))
+                    continue
+
 
 class Pawn(Figure):
 
@@ -71,48 +92,45 @@ class Pawn(Figure):
         # Флаг равен True, если пешка уже делала ход
         self.was_move = False
 
-    # Метод возвращает список клеток, на которые может пойти пешка
-    def get_moves(self, board):
-        moves = []
+    # Метод возвращает доступные ходы, взятия или защиты
+    def get_actions(self, board, option):
+        result = []
 
-        # Проверяем возможность хода на две клетки вперед
-        if not self.was_move:
-            if board.get_figure(self.row + self.direction, self.col) is None:
-                if board.get_figure(self.row + 2 * self.direction, self.col) is None:
-                    moves.append((self.row + 2 * self.direction, self.col))
+        # Ищем только доступные ходы
+        if option == MOVES:
+            r1 = self.row + self.direction
+            c = self.col
 
-        # Проверяем возможность хода на одну клетку вперед
-        if board.get_figure(self.row + self.direction, self.col) is None:
-            moves.append((self.row + self.direction, self.col))
+            # Проверяем возможность хода на две клетки вперед
+            if not self.was_move:
+                r2 = self.row + 2 * self.direction
+                if board.get_figure(r1, c) is None and board.get_figure(r2, c) is None:
+                    result.append((r2, c))
 
-        # Возвращаем результат
-        return moves
+            # Проверяем возможность хода на одну клетку вперед
+            if self.is_valid_pos(r1, c):
+                if board.get_figure(r1, c) is None:
+                    result.append((r1, c))
 
-    # Метод возвращает список взятий, которые может совершить пешка (исключая взятия на проходе)
-    def get_takes(self, board):
-        takes = []
-
-        r1 = self.row + self.direction
-        c1 = self.col - 1
-        r2 = self.row + self.direction
-        c2 = self.col + 1
-
-        # Проверяем взятие влево
-        if self.is_valid_pos(r1, c1):
-            figure = board.get_figure(r1, c1)
-            if figure is not None:
-                if figure.side != self.side:
-                    takes.append((r1, c1))
-
-        # Проверяем взятие вправо
-        if self.is_valid_pos(r2, c2):
-            figure = board.get_figure(r2, c2)
-            if figure is not None:
-                if figure.side != self.side:
-                    takes.append((r2, c2))
+        # Ищем взятия (за исключением взятия на проходе) и защиты
+        if option == TAKES or option == DEFENSE:
+            offsets = (-1, 1)
+            r1 = self.row + self.direction
+            for offset in offsets:
+                c1 = self.col + offset
+                if not self.is_valid_pos(r1, c1):
+                    continue
+                figure = board.get_figure(r1, c1)
+                if figure is not None:
+                    if figure.side == self.side and option == DEFENSE:
+                        result.append((r1, c1))
+                        continue
+                    if figure.side != self.side and option == TAKES:
+                        result.append((r1, c1))
+                        continue
 
         # Возвращаем результат
-        return takes
+        return result
 
     # Переопределение метода перемещения необходимо для того, чтобы исключить возможность повторного хода на две клетки
     def set_pos(self, r, c):
