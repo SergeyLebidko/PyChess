@@ -26,8 +26,8 @@ def start(player_side):
 
         # Блок команд отрисовки
         draw_cells(display_surface)
+        draw_select_cell(display_surface, selected_figure)
         draw_figures(display_surface, board)
-        draw_select_frame(display_surface, selected_figure)
         pygame.display.update()
 
         clock.tick(FPS)
@@ -55,10 +55,10 @@ def draw_figures(surface, board):
 
 
 # Функция отрисовывает рамку вокруг выбранной игроком фигуры
-def draw_select_frame(surface, selected_figure):
+def draw_select_cell(surface, selected_figure):
     if selected_figure:
         pygame.draw.rect(surface, SELECTED_CELL_COLOR,
-                         (selected_figure.col * CELL_SIZE, selected_figure.row * CELL_SIZE, CELL_SIZE, CELL_SIZE), 3)
+                         (selected_figure.col * CELL_SIZE, selected_figure.row * CELL_SIZE, CELL_SIZE, CELL_SIZE))
 
 
 # Функция определяет клетку, которую выбрал игрок

@@ -13,7 +13,7 @@ WHITE_CELL_COLOR = (230, 230, 230)
 BLACK_CELL_COLOR = (150, 150, 150)
 
 # Цвет выделенной ячейки
-SELECTED_CELL_COLOR = (100, 100, 255)
+SELECTED_CELL_COLOR = (180, 180, 255)
 
 # Опции для получения списков ходов
 MOVES = 'moves'                         # Обычные ходы
