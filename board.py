@@ -56,6 +56,11 @@ class Board:
             self.computer_figures.append(King(7, 4, self.player_side))
             self.computer_figures.append(Queen(7, 3, self.player_side))
 
+        # Создаем список сделанных во время игры ходов
+        self.move_list = []
+
+    # Метод возвращает список доступных для данной фигуры ходов
+    def get_avl_moves(self, figure):
         pass
 
     # Метод возвращает фигуру, стоящую на клетке r, c
