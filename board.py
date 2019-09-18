@@ -2,6 +2,12 @@ from figures import King, Queen, Rook, Bishop, Knight, Pawn
 from params import WHITE, BLACK
 
 
+class Move:
+
+    def __init__(self, move_type):
+        self.move_type = move_type
+
+
 class Board:
 
     def __init__(self, player_side):

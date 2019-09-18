@@ -16,6 +16,13 @@ BLACK_CELL_COLOR = (150, 150, 150)
 SELECTED_CELL_COLOR = (100, 100, 255)
 
 # Опции для получения списков ходов
-MOVES = 'moves'
-TAKES = 'takes'
-DEFENSE = 'defence'
+MOVES = 'moves'                         # Обычные ходы
+TAKES = 'takes'                         # Взятия
+DEFENSE = 'defence'                     # Защиты
+
+# Типы ходов
+NORMAL_MOVE = 'normal_move'             # Обычный ход
+TAKE_MOVE = 'take_move'                 # Ход-взятие
+CASTLING = 'castling'                   # Рокировка
+CONVERSION = 'conversion'               # Превращение пешки в другую фигуру
+PASSED_TAKE = 'passed_take'             # Взятие на проходе
