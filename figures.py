@@ -1,5 +1,5 @@
 import pygame
-from params import CELL_SIZE
+from params import *
 
 
 class Figure(pygame.sprite.Sprite):
@@ -17,8 +17,8 @@ class Figure(pygame.sprite.Sprite):
     def set_pos(self, r, c):
         self.row = r
         self.col = c
-        self.rect.left = r * CELL_SIZE
-        self.rect.top = c * CELL_SIZE
+        self.rect.left = c * CELL_SIZE
+        self.rect.top = r * CELL_SIZE
 
     @staticmethod
     def is_valid_pos(r, c):
@@ -159,7 +159,7 @@ class Pawn(Figure):
     def get_actions(self, *args):
         result = []
 
-        if 'moves' in args or not args:
+        if PAWN_MOVES in args or not args:
             # Проверяем возможность хода на одну клетку вперед
             r1 = self.row + self.direction
             c = self.col
@@ -174,7 +174,7 @@ class Pawn(Figure):
                     if self.board.get_figure(r1, c) is None and self.board.get_figure(r2, c) is None:
                         result.append((r2, c))
 
-        if 'takes' in args or not args:
+        if PAWN_TAKES in args or not args:
             # Ищем взятия (за исключением взятия на проходе) и защиты
             offsets = (-1, 1)
             r1 = self.row + self.direction

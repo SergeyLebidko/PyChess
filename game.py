@@ -1,5 +1,5 @@
 import pygame
-from params import FPS, WHITE_CELL_COLOR, BLACK_CELL_COLOR, SELECTED_CELL_COLOR, AVL_MOVE_CELL_COLOR, CELL_SIZE
+from params import *
 from board import Board
 
 
@@ -26,7 +26,17 @@ def start(player_side):
                 exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 selected_figure = get_mouse_selected_figure(event, board)
-                avl_moves = board.get_avl_moves_for_figure(selected_figure)
+                if selected_figure is not None:
+                    avl_moves = board.get_avl_moves_for_figure(selected_figure)
+                    continue
+                selected_cell = get_mouse_selected_cell(event)
+                selected_row = selected_cell[0]
+                selected_col = selected_cell[1]
+                for move in avl_moves:
+                    if selected_row == move.new_row and selected_col == move.new_col:
+                        board.apply_move(move)
+                        avl_moves = []
+                        selected_figure = None
 
         # Блок команд отрисовки
         draw_cells(display_surface)
@@ -72,7 +82,7 @@ def draw_avl_moves(surface, avl_moves):
         row_move = move.new_row
         col_move = move.new_col
         pygame.draw.rect(surface, AVL_MOVE_CELL_COLOR,
-                         (col_move * CELL_SIZE+4, row_move * CELL_SIZE+4, CELL_SIZE-8, CELL_SIZE-8))
+                         (col_move * CELL_SIZE + 4, row_move * CELL_SIZE + 4, CELL_SIZE - 8, CELL_SIZE - 8))
     pass
 
 

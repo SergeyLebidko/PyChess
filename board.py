@@ -1,11 +1,11 @@
 from figures import King, Queen, Rook, Bishop, Knight, Pawn
-from params import WHITE, BLACK, NORMAL_MOVE, TAKE_MOVE
+from params import *
 
 
 class Move:
 
     def __init__(self, move_type):
-        self.move_type = move_type
+        self.m_type = move_type
 
 
 class Board:
@@ -79,11 +79,11 @@ class Board:
         # Поэтому код создания ходов для пешек отличается от кода создания ходов для других фигур
         if figure_type == Pawn:
             # Создаем обычные ходы пешки
-            actions = figure.get_actions('moves')
+            actions = figure.get_actions(PAWN_MOVES)
             for new_row, new_col in actions:
                 moves.append(self.create_normal_move(figure, new_row, new_col))
             # Создаем взятия
-            actions = figure.get_actions('takes')
+            actions = figure.get_actions(PAWN_TAKES)
             for new_row, new_col in actions:
                 drop_figure = self.get_figure(new_row, new_col)
                 if drop_figure is None:
@@ -133,10 +133,24 @@ class Board:
         move.new_row = new_row
         move.new_col = new_col
         move.drop_figure = self.get_figure(new_row, new_col)
+        return move
 
     # Метод применяет переданный ход и вносит его в список совершенных ходов
     def apply_move(self, move):
-        pass
+        # Вносим применяемый ход в список ходов
+        self.move_list.append(move)
+
+        # Выполняем действия хода в зависимости от его типа
+        # Обычный ход
+        if move.m_type == NORMAL_MOVE:
+            move.figure.set_pos(move.new_row, move.new_col)
+            return
+
+        # Ход-взятие
+        if move.m_type == TAKE_MOVE:
+            move.figure.set_pos(move.new_row, move.new_col)
+            move.drop_figure.is_drop = True
+            return
 
     # Метод откатывает последний ход из списка совершенных ходов
     def cancel_move(self):

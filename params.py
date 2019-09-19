@@ -1,5 +1,5 @@
 # Частота кадро
-FPS = 30
+FPS = 5
 
 # Константы сторон
 WHITE = 'white'
@@ -17,6 +17,10 @@ SELECTED_CELL_COLOR = (120, 120, 255)
 
 # Цвет ячейки, доступной для хода
 AVL_MOVE_CELL_COLOR = (255, 120, 120)
+
+# Имена действий, доступных для пешки
+PAWN_MOVES = 'pawn_moves'
+PAWN_TAKES = 'pawn_takes'
 
 # Типы ходов
 NORMAL_MOVE = 'normal_move'   # Обычный ход
