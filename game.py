@@ -4,14 +4,17 @@ from params import *
 # Текущий холст
 surface = None
 
-# Выделенная пользователем клетка
+# Текущее игровое поле
+board = None
+
+# Выделенная пользователем фигура
 selected_figure = None
 
 # Список доступных ходов
 avl_moves = []
 
-# Текущее игровое поле
-board = None
+# Выбранный ход
+selected_move = None
 
 # Текущий режим работы
 mode = 'mode_1'
@@ -21,10 +24,10 @@ msg = None
 
 
 def start(player_side):
-    global surface, selected_figure, avl_moves, board, mode, msg
+    global surface, board, selected_figure, avl_moves, selected_move, mode, msg
     pygame.init()
     pygame.display.set_caption('PyChess')
-    surface = pygame.display.set_mode((400, 400))
+    surface = pygame.display.set_mode((CELL_SIZE * 8, CELL_SIZE * 8))
     clock = pygame.time.Clock()
 
     board = Board(player_side)
