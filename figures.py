@@ -153,31 +153,33 @@ class Pawn(Figure):
         if self.row == 6:
             self.direction = -1
 
-    def get_actions(self):
+    def get_actions(self, *args):
         result = []
 
-        # Проверяем возможность хода на одну клетку вперед
-        r1 = self.row + self.direction
-        c = self.col
-        if self.is_valid_pos(r1, c):
-            if self.board.get_figure(r1, c) is None:
-                result.append((r1, c))
+        if 'moves' in args:
+            # Проверяем возможность хода на одну клетку вперед
+            r1 = self.row + self.direction
+            c = self.col
+            if self.is_valid_pos(r1, c):
+                if self.board.get_figure(r1, c) is None:
+                    result.append((r1, c))
 
-        # Проверяем возможность хода на две клетки вперед
-        if self.row == 1 or self.row == 6:
-            r2 = self.row + 2 * self.direction
-            if self.is_valid_pos(r2, c):
-                if self.board.get_figure(r1, c) is None and self.board.get_figure(r2, c) is None:
-                    result.append((r2, c))
+            # Проверяем возможность хода на две клетки вперед
+            if self.row == 1 or self.row == 6:
+                r2 = self.row + 2 * self.direction
+                if self.is_valid_pos(r2, c):
+                    if self.board.get_figure(r1, c) is None and self.board.get_figure(r2, c) is None:
+                        result.append((r2, c))
 
-        # Ищем взятия (за исключением взятия на проходе) и защиты
-        offsets = (-1, 1)
-        r1 = self.row + self.direction
-        for offset in offsets:
-            c1 = self.col + offset
-            if not self.is_valid_pos(r1, c1):
-                continue
-            result.append((r1, c1))
+        if 'takes' in args:
+            # Ищем взятия (за исключением взятия на проходе) и защиты
+            offsets = (-1, 1)
+            r1 = self.row + self.direction
+            for offset in offsets:
+                c1 = self.col + offset
+                if not self.is_valid_pos(r1, c1):
+                    continue
+                result.append((r1, c1))
 
         # Возвращаем результат
         return result
