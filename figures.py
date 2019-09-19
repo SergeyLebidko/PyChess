@@ -37,9 +37,9 @@ class King(Figure):
         result = []
         offsets = [(-1, 0), (0, 1), (1, 0), (0, 1), (-1, 1), (1, 1), (1, -1), (-1, -1)]
 
-        for offset in offsets:
-            r1 = self.row + offset[0]
-            c1 = self.col + offset[1]
+        for delta_row, delta_col in offsets:
+            r1 = self.row + delta_row
+            c1 = self.col + delta_col
             if not self.is_valid_pos(r1, c1):
                 continue
 
@@ -56,12 +56,12 @@ class Queen(Figure):
         result = []
         offsets = [(-1, 0), (0, 1), (1, 0), (0, 1), (-1, 1), (1, 1), (1, -1), (-1, -1)]
 
-        for offset in offsets:
+        for delta_row, delta_col in offsets:
             mul = 0
             while True:
                 mul += 1
-                r1 = self.row + mul * offset[0]
-                c1 = self.col + mul * offset[1]
+                r1 = self.row + mul * delta_row
+                c1 = self.col + mul * delta_col
                 if not self.is_valid_pos(r1, c1):
                     break
                 result.append((r1, c1))
@@ -82,12 +82,12 @@ class Rook(Figure):
         result = []
         offsets = [(-1, 0), (0, 1), (1, 0), (0, 1)]
 
-        for offset in offsets:
+        for delta_row, delta_col in offsets:
             mul = 0
             while True:
                 mul += 1
-                r1 = self.row + mul * offset[0]
-                c1 = self.col + mul * offset[1]
+                r1 = self.row + mul * delta_row
+                c1 = self.col + mul * delta_col
                 if not self.is_valid_pos(r1, c1):
                     break
                 result.append((r1, c1))
@@ -108,12 +108,12 @@ class Bishop(Figure):
         result = []
         offsets = [(-1, 1), (1, 1), (1, -1), (-1, -1)]
 
-        for offset in offsets:
+        for delta_row, delta_col in offsets:
             mul = 0
             while True:
                 mul += 1
-                r1 = self.row + mul * offset[0]
-                c1 = self.col + mul * offset[1]
+                r1 = self.row + mul * delta_row
+                c1 = self.col + mul * delta_col
                 if not self.is_valid_pos(r1, c1):
                     break
                 result.append((r1, c1))
@@ -134,9 +134,9 @@ class Knight(Figure):
         result = []
 
         offsets = [(-2, 1), (-1, 2), (1, 2), (2, 1), (2, -1), (1, -2), (-1, -2), (-2, -1)]
-        for offset in offsets:
-            r1 = self.row + offset[0]
-            c1 = self.col + offset[1]
+        for delta_row, delta_col in offsets:
+            r1 = self.row + delta_row
+            c1 = self.col + delta_col
             if not self.is_valid_pos(r1, c1):
                 continue
             result.append((r1, c1))
@@ -156,7 +156,7 @@ class Pawn(Figure):
     def get_actions(self, *args):
         result = []
 
-        if 'moves' in args:
+        if 'moves' in args or not args:
             # Проверяем возможность хода на одну клетку вперед
             r1 = self.row + self.direction
             c = self.col
@@ -171,7 +171,7 @@ class Pawn(Figure):
                     if self.board.get_figure(r1, c) is None and self.board.get_figure(r2, c) is None:
                         result.append((r2, c))
 
-        if 'takes' in args:
+        if 'takes' in args or not args:
             # Ищем взятия (за исключением взятия на проходе) и защиты
             offsets = (-1, 1)
             r1 = self.row + self.direction

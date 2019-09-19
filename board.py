@@ -1,5 +1,5 @@
 from figures import King, Queen, Rook, Bishop, Knight, Pawn
-from params import WHITE, BLACK
+from params import WHITE, BLACK, NORMAL_MOVE, TAKE_MOVE
 
 
 class Move:
@@ -76,18 +76,70 @@ class Board:
         # - только пешки бьют и ходят на разные поля
         # - только у пешек есть взятие на проходе
         # - только пешка может превратиться в другую фигуру при достижении края поля
+        # Поэтому код создания ходов для пешек отличается от кода создания ходов для других фигур
         if figure_type == Pawn:
-            pass
+            # Создаем обычные ходы пешки
+            actions = figure.get_actions('moves')
+            for new_row, new_col in actions:
+                moves.append(self.create_normal_move(figure, new_row, new_col))
+            # Создаем взятия
+            actions = figure.get_actions('takes')
+            for new_row, new_col in actions:
+                drop_figure = self.get_figure(new_row, new_col)
+                if drop_figure is None:
+                    continue
+                if drop_figure.side == figure.side:
+                    continue
+                moves.append(self.create_take_move(figure, new_row, new_col))
+            # Здесь необходимо вставить код создания ходов:
+            # - взятия на проходе
+            # - превращения пешки в другую фигуру при достижении края доски
+
+        # Получаем ходы других фигур
+        if figure_type != Pawn:
+            actions = figure.get_actions()
+            for new_row, new_col in actions:
+                drop_figure = self.get_figure(new_row, new_col)
+                if drop_figure is None:
+                    moves.append(self.create_normal_move(figure, new_row, new_col))
+                    continue
+                if drop_figure.side != figure.side:
+                    moves.append(self.create_take_move(figure, new_row, new_col))
+
+        # Здесь необходимо вставить код проверки возможности и создания рокировки, если figure_type == King
+
+        # Здесь необходимо вставить код отсечения ходов, ведущих к шаху
 
         # Возвращаем результат
         return moves
 
-    # Метод применяет переданных ход и вносит его в список совершенных ходов
-    def make_move(self, move):
+    # Метод создает обычный ход
+    @staticmethod
+    def create_normal_move(figure, new_row, new_col):
+        move = Move(NORMAL_MOVE)
+        move.figure = figure
+        move.old_row = figure.row
+        move.old_col = figure.col
+        move.new_row = new_row
+        move.new_col = new_col
+        return move
+
+    # Метод создает ход-взятие
+    def create_take_move(self, figure, new_row, new_col):
+        move = Move(TAKE_MOVE)
+        move.figure = figure
+        move.old_row = figure.row
+        move.old_col = figure.col
+        move.new_row = new_row
+        move.new_col = new_col
+        move.drop_figure = self.get_figure(new_row, new_col)
+
+    # Метод применяет переданный ход и вносит его в список совершенных ходов
+    def apply_move(self, move):
         pass
 
     # Метод откатывает последний ход из списка совершенных ходов
-    def unmake_move(self):
+    def cancel_move(self):
         if len(self.move_list) == 0:
             return
         pass
