@@ -1,3 +1,4 @@
 import game
+from params import WHITE
 
-game.start('white')
+game.start(WHITE)
