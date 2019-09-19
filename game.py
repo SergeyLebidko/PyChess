@@ -1,6 +1,6 @@
 import pygame
 from params import *
-from board import Board
+from boards import Board
 
 
 def start(player_side):
@@ -15,11 +15,11 @@ def start(player_side):
     # Список доступных ходов
     avl_moves = []
 
-    # Режим обработки событий
-    mode = 'mode_1'
-
     # Создаем текущее игровое поле
     board = Board(player_side)
+
+    # Текущий режим работы
+    mode = 'mode_1'
 
     while True:
         # Обрабатываем события
@@ -28,6 +28,9 @@ def start(player_side):
             if event.type == pygame.QUIT:
                 exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button != 1:
+                    continue
+
                 if mode == 'mode_1':
                     # В первом режиме разрешен выбор только фигур
                     selected_figure = get_mouse_selected_figure(event, board)
@@ -109,17 +112,16 @@ def draw_avl_moves(surface, avl_moves):
 
 # Функция определяет клетку, которую выбрал игрок
 def get_mouse_selected_cell(mouse_event):
-    if mouse_event.button != 1:
-        return None
     c = mouse_event.pos[0] // CELL_SIZE
     r = mouse_event.pos[1] // CELL_SIZE
     return r, c
 
 
 # Функция определяет фигуру, которую выбрал игрок
-def get_mouse_selected_figure(mouse_event, board):
+def get_mouse_selected_figure(mouse_event, board, side=None):
     cell = get_mouse_selected_cell(mouse_event)
-    if not cell:
-        return None
     figure = board.get_figure(cell[0], cell[1])
+    if side is not None and figure is not None:
+        if figure.side != side:
+            return None
     return figure
