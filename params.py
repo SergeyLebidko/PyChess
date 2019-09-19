@@ -13,11 +13,14 @@ WHITE_CELL_COLOR = (230, 230, 230)
 BLACK_CELL_COLOR = (150, 150, 150)
 
 # Цвет выделенной ячейки
-SELECTED_CELL_COLOR = (180, 180, 255)
+SELECTED_CELL_COLOR = (120, 120, 255)
+
+# Цвет ячейки, доступной для хода
+AVL_MOVE_CELL_COLOR = (255, 120, 120)
 
 # Типы ходов
-NORMAL_MOVE = 'normal_move'             # Обычный ход
-TAKE_MOVE = 'take_move'                 # Ход-взятие
-CASTLING = 'castling'                   # Рокировка
-CONVERSION = 'conversion'               # Превращение пешки в другую фигуру
-PASSED_TAKE = 'passed_take'             # Взятие на проходе
+NORMAL_MOVE = 'normal_move'   # Обычный ход
+TAKE_MOVE = 'take_move'       # Ход-взятие
+CASTLING = 'castling'         # Рокировка
+CONVERSION = 'conversion'     # Превращение пешки в другую фигуру
+PASSED_TAKE = 'passed_take'   # Взятие на проходе

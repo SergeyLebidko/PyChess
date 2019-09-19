@@ -1,5 +1,5 @@
 import pygame
-from params import FPS, WHITE_CELL_COLOR, BLACK_CELL_COLOR, SELECTED_CELL_COLOR, CELL_SIZE
+from params import FPS, WHITE_CELL_COLOR, BLACK_CELL_COLOR, SELECTED_CELL_COLOR, AVL_MOVE_CELL_COLOR, CELL_SIZE
 from board import Board
 
 
@@ -12,6 +12,9 @@ def start(player_side):
     # Выделенная пользователем клетка
     selected_figure = None
 
+    # Список доступных ходов
+    avl_moves = []
+
     # Создаем текущее игровое поле
     board = Board(player_side)
 
@@ -23,10 +26,12 @@ def start(player_side):
                 exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 selected_figure = get_mouse_selected_figure(event, board)
+                avl_moves = board.get_avl_moves_for_figure(selected_figure)
 
         # Блок команд отрисовки
         draw_cells(display_surface)
         draw_select_cell(display_surface, selected_figure)
+        draw_avl_moves(display_surface, avl_moves)
         draw_figures(display_surface, board)
         pygame.display.update()
 
@@ -54,11 +59,21 @@ def draw_figures(surface, board):
             surface.blit(figure.image, figure.rect)
 
 
-# Функция отрисовывает рамку вокруг выбранной игроком фигуры
+# Функция отрисовывает выбранную игроком клетку
 def draw_select_cell(surface, selected_figure):
     if selected_figure:
         pygame.draw.rect(surface, SELECTED_CELL_COLOR,
                          (selected_figure.col * CELL_SIZE, selected_figure.row * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+
+
+# Функция отрисовывает клетки, доступные для хода выбранной фигурой
+def draw_avl_moves(surface, avl_moves):
+    for move in avl_moves:
+        row_move = move.new_row
+        col_move = move.new_col
+        pygame.draw.rect(surface, AVL_MOVE_CELL_COLOR,
+                         (col_move * CELL_SIZE+4, row_move * CELL_SIZE+4, CELL_SIZE-8, CELL_SIZE-8))
+    pass
 
 
 # Функция определяет клетку, которую выбрал игрок

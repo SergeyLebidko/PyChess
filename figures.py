@@ -141,6 +141,9 @@ class Knight(Figure):
                 continue
             result.append((r1, c1))
 
+        # Возвращаем результат
+        return result
+
 
 class Pawn(Figure):
 
@@ -148,7 +151,7 @@ class Pawn(Figure):
         Figure.__init__(self, 'sprites/' + side + 'Pawn.png', r, c, side, board)
 
         # Выбираем направление движения пешки в зависимости от того, где находится её стартовая позиция
-        if self.col == 1:
+        if self.row == 1:
             self.direction = 1
         if self.row == 6:
             self.direction = -1
