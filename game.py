@@ -15,6 +15,9 @@ def start(player_side):
     # Список доступных ходов
     avl_moves = []
 
+    # Режим обработки событий
+    mode = 'mode_1'
+
     # Создаем текущее игровое поле
     board = Board(player_side)
 
@@ -25,18 +28,36 @@ def start(player_side):
             if event.type == pygame.QUIT:
                 exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                selected_figure = get_mouse_selected_figure(event, board)
-                if selected_figure is not None:
-                    avl_moves = board.get_avl_moves_for_figure(selected_figure)
+                if mode == 'mode_1':
+                    # В первом режиме разрешен выбор только фигур
+                    selected_figure = get_mouse_selected_figure(event, board)
+                    if selected_figure is not None:
+                        avl_moves = board.get_avl_moves_for_figure(selected_figure)
+                        mode = 'mode_2'
                     continue
-                selected_cell = get_mouse_selected_cell(event)
-                selected_row = selected_cell[0]
-                selected_col = selected_cell[1]
-                for move in avl_moves:
-                    if selected_row == move.new_row and selected_col == move.new_col:
-                        board.apply_move(move)
-                        avl_moves = []
+                if mode == 'mode_2':
+                    # Во втором режиме можно выбирать и фигуры, и клетки, доступные для хода
+                    selected_row, selected_col = get_mouse_selected_cell(event)
+
+                    # Проверяем, был ли выбран доступный ход и, если да, то применяем его
+                    applied_move = None
+                    for move in avl_moves:
+                        if move.new_row == selected_row and move.new_col == selected_col:
+                            applied_move = move
+                            break
+                    if applied_move is not None:
+                        board.apply_move(applied_move)
                         selected_figure = None
+                        avl_moves = []
+                        mode = 'mode_1'
+                        continue
+
+                    # Если была выбрана другая фигура, то получаем список ходов для неё
+                    new_selected_figure = get_mouse_selected_figure(event, board)
+                    if new_selected_figure is not None:
+                        if selected_figure != new_selected_figure:
+                            selected_figure = new_selected_figure
+                            avl_moves = board.get_avl_moves_for_figure(selected_figure)
 
         # Блок команд отрисовки
         draw_cells(display_surface)

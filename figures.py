@@ -35,13 +35,14 @@ class King(Figure):
 
     def get_actions(self):
         result = []
-        offsets = [(-1, 0), (0, 1), (1, 0), (0, 1), (-1, 1), (1, 1), (1, -1), (-1, -1)]
+        offsets = [(-1, 0), (0, 1), (1, 0), (0, -1), (-1, 1), (1, 1), (1, -1), (-1, -1)]
 
         for delta_row, delta_col in offsets:
             r1 = self.row + delta_row
             c1 = self.col + delta_col
             if not self.is_valid_pos(r1, c1):
                 continue
+            result.append((r1, c1))
 
         # Возвращаем результат
         return result
@@ -54,7 +55,7 @@ class Queen(Figure):
 
     def get_actions(self):
         result = []
-        offsets = [(-1, 0), (0, 1), (1, 0), (0, 1), (-1, 1), (1, 1), (1, -1), (-1, -1)]
+        offsets = [(-1, 0), (0, 1), (1, 0), (0, -1), (-1, 1), (1, 1), (1, -1), (-1, -1)]
 
         for delta_row, delta_col in offsets:
             mul = 0
@@ -80,7 +81,7 @@ class Rook(Figure):
 
     def get_actions(self):
         result = []
-        offsets = [(-1, 0), (0, 1), (1, 0), (0, 1)]
+        offsets = [(-1, 0), (0, 1), (1, 0), (0, -1)]
 
         for delta_row, delta_col in offsets:
             mul = 0
