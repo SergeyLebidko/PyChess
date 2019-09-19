@@ -15,11 +15,6 @@ BLACK_CELL_COLOR = (150, 150, 150)
 # Цвет выделенной ячейки
 SELECTED_CELL_COLOR = (180, 180, 255)
 
-# Опции для получения списков ходов
-MOVES = 'moves'                         # Обычные ходы
-TAKES = 'takes'                         # Взятия
-DEFENSE = 'defence'                     # Защиты
-
 # Типы ходов
 NORMAL_MOVE = 'normal_move'             # Обычный ход
 TAKE_MOVE = 'take_move'                 # Ход-взятие

@@ -10,62 +10,68 @@ class Move:
 
 class Board:
 
-    def __init__(self, player_side):
-        self.player_side = player_side
-        if player_side == WHITE:
-            self.computer_side = BLACK
-        if player_side == BLACK:
-            self.computer_side = WHITE
+    def __init__(self, pl_side):
+        self.pl_side = pl_side
+        if pl_side == WHITE:
+            self.cmp_side = BLACK
+        if pl_side == BLACK:
+            self.cmp_side = WHITE
 
-        self.player_figures = []
-        self.computer_figures = []
+        self.pl_figures = []
+        self.cmp_figures = []
 
         # Создаем фигуры компьютера
+        if self.cmp_side == WHITE:
+            self.cmp_king = King(0, 3, self.cmp_side, self)
+            self.cmp_figures.append(self.cmp_king)
+            self.cmp_figures.append(Queen(0, 4, self.cmp_side, self))
+
+        if self.cmp_side == BLACK:
+            self.cmp_king = King(0, 4, self.cmp_side, self)
+            self.cmp_figures.append(self.cmp_king)
+            self.cmp_figures.append(Queen(0, 3, self.cmp_side, self))
+
+        self.cmp_figures.append(Rook(0, 0, self.cmp_side, self))
+        self.cmp_figures.append(Rook(0, 7, self.cmp_side, self))
+        self.cmp_figures.append(Knight(0, 1, self.cmp_side, self))
+        self.cmp_figures.append(Knight(0, 6, self.cmp_side, self))
+        self.cmp_figures.append(Bishop(0, 2, self.cmp_side, self))
+        self.cmp_figures.append(Bishop(0, 5, self.cmp_side, self))
+
         for i in range(0, 8):
-            self.computer_figures.append(Pawn(1, i, self.computer_side))
-        self.computer_figures.append(Rook(0, 0, self.computer_side))
-        self.computer_figures.append(Rook(0, 7, self.computer_side))
-        self.computer_figures.append(Knight(0, 1, self.computer_side))
-        self.computer_figures.append(Knight(0, 6, self.computer_side))
-        self.computer_figures.append(Bishop(0, 2, self.computer_side))
-        self.computer_figures.append(Bishop(0, 5, self.computer_side))
-
-        if self.computer_side == WHITE:
-            self.computer_figures.append(King(0, 3, self.computer_side))
-            self.computer_figures.append(Queen(0, 4, self.computer_side))
-
-        if self.computer_side == BLACK:
-            self.computer_figures.append(King(0, 4, self.computer_side))
-            self.computer_figures.append(Queen(0, 3, self.computer_side))
+            self.cmp_figures.append(Pawn(1, i, self.cmp_side, self))
 
         # Создаем фигуры игрока
+        if self.cmp_side == WHITE:
+            self.pl_king = King(7, 3, self.pl_side, self)
+            self.cmp_figures.append(self.pl_king)
+            self.cmp_figures.append(Queen(7, 4, self.pl_side, self))
+
+        if self.cmp_side == BLACK:
+            self.pl_king = King(7, 4, self.pl_side, self)
+            self.cmp_figures.append(self.pl_king)
+            self.cmp_figures.append(Queen(7, 3, self.pl_side, self))
+
+        self.cmp_figures.append(Rook(7, 0, self.pl_side, self))
+        self.cmp_figures.append(Rook(7, 7, self.pl_side, self))
+        self.cmp_figures.append(Knight(7, 1, self.pl_side, self))
+        self.cmp_figures.append(Knight(7, 6, self.pl_side, self))
+        self.cmp_figures.append(Bishop(7, 2, self.pl_side, self))
+        self.cmp_figures.append(Bishop(7, 5, self.pl_side, self))
+
         for i in range(0, 8):
-            self.computer_figures.append(Pawn(6, i, self.player_side))
-        self.computer_figures.append(Rook(7, 0, self.player_side))
-        self.computer_figures.append(Rook(7, 7, self.player_side))
-        self.computer_figures.append(Knight(7, 1, self.player_side))
-        self.computer_figures.append(Knight(7, 6, self.player_side))
-        self.computer_figures.append(Bishop(7, 2, self.player_side))
-        self.computer_figures.append(Bishop(7, 5, self.player_side))
-
-        if self.computer_side == WHITE:
-            self.computer_figures.append(King(7, 3, self.player_side))
-            self.computer_figures.append(Queen(7, 4, self.player_side))
-
-        if self.computer_side == BLACK:
-            self.computer_figures.append(King(7, 4, self.player_side))
-            self.computer_figures.append(Queen(7, 3, self.player_side))
+            self.cmp_figures.append(Pawn(6, i, self.pl_side, self))
 
         # Создаем список сделанных во время игры ходов
         self.move_list = []
 
     # Метод возвращает список доступных для данной фигуры ходов
-    def get_avl_moves(self, figure):
+    def get_avl_moves_for_figure(self, figure):
         pass
 
     # Метод возвращает фигуру, стоящую на клетке r, c
     def get_figure(self, r, c):
-        for figure in (self.player_figures + self.computer_figures):
+        for figure in (self.pl_figures + self.cmp_figures):
             if figure.row == r and figure.col == c and not figure.is_drop:
                 return figure
         return None
