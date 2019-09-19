@@ -1,5 +1,4 @@
-from figures import King, Queen, Rook, Bishop, Knight, Pawn
-from params import *
+from figures import *
 
 
 class Move:
@@ -164,3 +163,22 @@ class Board:
             if figure.row == r and figure.col == c and not figure.is_drop:
                 return figure
         return None
+
+
+class SelectorBoard:
+
+    def __init__(self, side):
+        self.queen = Queen(3, 3, side, self)
+        self.rook = Rook(3, 4, side, self)
+        self.bishop = Bishop(4, 3, side, self)
+        self.knight = Knight(4, 4, side, self)
+
+    def get_figure(self, r, c):
+        if r == 3 and c == 3:
+            return self.queen
+        if r == 3 and c == 4:
+            return self.rook
+        if r == 4 and c == 3:
+            return self.bishop
+        if r == 4 and c == 4:
+            return self.knight

@@ -1,25 +1,33 @@
-import pygame
+from boards import *
 from params import *
-from boards import Board
+
+# Текущий холст
+surface = None
+
+# Выделенная пользователем клетка
+selected_figure = None
+
+# Список доступных ходов
+avl_moves = []
+
+# Текущее игровое поле
+board = None
+
+# Текущий режим работы
+mode = 'mode_1'
+
+# Сообщение
+msg = None
 
 
 def start(player_side):
+    global surface, selected_figure, avl_moves, board, mode, msg
     pygame.init()
     pygame.display.set_caption('PyChess')
-    display_surface = pygame.display.set_mode((400, 400))
+    surface = pygame.display.set_mode((400, 400))
     clock = pygame.time.Clock()
 
-    # Выделенная пользователем клетка
-    selected_figure = None
-
-    # Список доступных ходов
-    avl_moves = []
-
-    # Создаем текущее игровое поле
     board = Board(player_side)
-
-    # Текущий режим работы
-    mode = 'mode_1'
 
     while True:
         # Обрабатываем события
@@ -33,7 +41,7 @@ def start(player_side):
 
                 if mode == 'mode_1':
                     # В первом режиме разрешен выбор только фигур
-                    selected_figure = get_mouse_selected_figure(event, board)
+                    selected_figure = get_mouse_selected_figure(event)
                     if selected_figure is not None:
                         avl_moves = board.get_avl_moves_for_figure(selected_figure)
                         mode = 'mode_2'
@@ -56,24 +64,25 @@ def start(player_side):
                         continue
 
                     # Если была выбрана другая фигура, то получаем список ходов для неё
-                    new_selected_figure = get_mouse_selected_figure(event, board)
+                    new_selected_figure = get_mouse_selected_figure(event)
                     if new_selected_figure is not None:
                         if selected_figure != new_selected_figure:
                             selected_figure = new_selected_figure
                             avl_moves = board.get_avl_moves_for_figure(selected_figure)
 
         # Блок команд отрисовки
-        draw_cells(display_surface)
-        draw_select_cell(display_surface, selected_figure)
-        draw_avl_moves(display_surface, avl_moves)
-        draw_figures(display_surface, board)
+        draw_cells()
+        draw_select_cell()
+        draw_avl_moves()
+        draw_figures()
+        draw_msg()
         pygame.display.update()
 
         clock.tick(FPS)
 
 
 # Функция отрисовывает клетки доски
-def draw_cells(surface):
+def draw_cells():
     for r in range(0, 8):
         for c in range(0, 8):
             if (r + c) % 2 == 0:
@@ -84,7 +93,7 @@ def draw_cells(surface):
 
 
 # Функция отрисовывает фигуры на доске
-def draw_figures(surface, board):
+def draw_figures():
     for row in range(0, 8):
         for col in range(0, 8):
             figure = board.get_figure(row, col)
@@ -94,20 +103,26 @@ def draw_figures(surface, board):
 
 
 # Функция отрисовывает выбранную игроком клетку
-def draw_select_cell(surface, selected_figure):
+def draw_select_cell():
     if selected_figure:
         pygame.draw.rect(surface, SELECTED_CELL_COLOR,
                          (selected_figure.col * CELL_SIZE, selected_figure.row * CELL_SIZE, CELL_SIZE, CELL_SIZE))
 
 
 # Функция отрисовывает клетки, доступные для хода выбранной фигурой
-def draw_avl_moves(surface, avl_moves):
+def draw_avl_moves():
     for move in avl_moves:
         row_move = move.new_row
         col_move = move.new_col
         pygame.draw.rect(surface, AVL_MOVE_CELL_COLOR,
                          (col_move * CELL_SIZE + 4, row_move * CELL_SIZE + 4, CELL_SIZE - 8, CELL_SIZE - 8))
     pass
+
+
+# Функция отрисовки сообщения
+def draw_msg():
+    if not msg:
+        return
 
 
 # Функция определяет клетку, которую выбрал игрок
@@ -118,7 +133,7 @@ def get_mouse_selected_cell(mouse_event):
 
 
 # Функция определяет фигуру, которую выбрал игрок
-def get_mouse_selected_figure(mouse_event, board, side=None):
+def get_mouse_selected_figure(mouse_event, side=None):
     cell = get_mouse_selected_cell(mouse_event)
     figure = board.get_figure(cell[0], cell[1])
     if side is not None and figure is not None:
