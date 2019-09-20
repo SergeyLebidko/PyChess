@@ -12,6 +12,9 @@ CELL_SIZE = 50
 WHITE_CELL_COLOR = (230, 230, 230)
 BLACK_CELL_COLOR = (150, 150, 150)
 
+# Цвет текста для сообщений
+MSG_COLOR = (30, 30, 160)
+
 # Цвет выделенной ячейки
 SELECTED_CELL_COLOR = (120, 120, 255)
 

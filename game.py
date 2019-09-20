@@ -30,7 +30,8 @@ def start(player_side):
     surface = pygame.display.set_mode((CELL_SIZE * 8, CELL_SIZE * 8))
     clock = pygame.time.Clock()
 
-    board = Board(player_side)
+    main_board = Board(player_side)
+    board = main_board
 
     while True:
         # Обрабатываем события
@@ -42,36 +43,79 @@ def start(player_side):
                 if event.button != 1:
                     continue
 
+                # В режиме 1 разрешен только выбор фигур
+                #  При выборе фигуры, получаем список доступных ходов для неё и если он не пуст - переходим в режим 2
                 if mode == 'mode_1':
-                    # В первом режиме разрешен выбор только фигур
-                    selected_figure = get_mouse_selected_figure(event)
+                    selected_figure = get_mouse_selected_figure(event, player_side)
                     if selected_figure is not None:
                         avl_moves = board.get_avl_moves_for_figure(selected_figure)
-                        mode = 'mode_2'
-                    continue
-                if mode == 'mode_2':
-                    # Во втором режиме можно выбирать и фигуры, и клетки, доступные для хода
-                    selected_row, selected_col = get_mouse_selected_cell(event)
+                        if avl_moves:
+                            mode = 'mode_2'
+                            continue
 
-                    # Проверяем, был ли выбран доступный ход и, если да, то применяем его
-                    applied_move = None
+                # В режиме 2 разрешен выбор фигур и ходов
+                # Если выбран ход-конверсия, то переходим в режим 3
+                # Если выбран любой другой ход, то переходим в режим 4
+                # Если выбрана другая фигура, то получаем её список доступных ходов
+                if mode == 'mode_2':
+                    selected_row, selected_col = get_mouse_selected_cell(event)
+                    # Сперва проверяем, выбран ли ход
+                    selected_move = None
                     for move in avl_moves:
-                        if move.new_row == selected_row and move.new_col == selected_col:
-                            applied_move = move
+                        if selected_row == move.new_row and selected_col == move.new_col:
+                            selected_move = move
                             break
-                    if applied_move is not None:
-                        board.apply_move(applied_move)
-                        selected_figure = None
-                        avl_moves = []
-                        mode = 'mode_1'
+
+                    if selected_move is not None:
+                        # Если ход выбран и это ход-конверсия, то переходим в режим 3
+                        if selected_move.m_type == CONVERSION:
+                            selected_figure = None
+                            avl_moves = []
+                            board = SelectorBoard(player_side, main_board)
+                            mode = 'mode_3'
+                            continue
+                        # Если ход выбран и это не ход-конверсия, то переходим в режим 4
+                        mode = 'mode_4'
                         continue
 
-                    # Если была выбрана другая фигура, то получаем список ходов для неё
-                    new_selected_figure = get_mouse_selected_figure(event)
+                    # Если выбрана фигура, то получаем ее список доступных ходов
+                    new_selected_figure = get_mouse_selected_figure(event, player_side)
                     if new_selected_figure is not None:
-                        if selected_figure != new_selected_figure:
-                            selected_figure = new_selected_figure
-                            avl_moves = board.get_avl_moves_for_figure(selected_figure)
+                        selected_figure = new_selected_figure
+                        avl_moves = board.get_avl_moves_for_figure(selected_figure)
+                    continue
+
+                # В режиме 3  нужно выбрать фигуру для хода конверсии
+                # Если фигруа выбрана, то записываем её в объект хода и переходим в режим 4
+                if mode == 'mode_3':
+                    selected_figure = get_mouse_selected_figure(event, player_side)
+                    if selected_figure is not None:
+                        selected_figure.set_pos(selected_move.new_row, selected_move.new_col)
+                        selected_move.new_figure = selected_figure
+                        board = main_board
+                        mode = 'mode_4'
+                        continue
+
+                # В режиме шесть игроку выведено сообщение о завершении игры и любой щелчок мышью приводит к выходу
+                if mode == 'mode_6':
+                    exit()
+
+        # Режим 4 не связан с событиями мыши ил клавиатуры
+        # В этом режиме происходит процесс применения хода игрока и проверка условия завешения игры
+        if mode == 'mode_4':
+            board.apply_move(selected_move)
+            selected_move = None
+            avl_moves = []
+            # Вставить код проверки завершения игры
+            # Если игра завершена, то перейти в режим 6
+            # Если игра не завершена, то перейти в режим 5
+            mode = 'mode_5'
+
+        # В режиме 5 происходит вычисление ответного хода компьютера и проверка его результатов
+        # Если игра завершена, то происходит переход в режим 6
+        # Если игра не завершена, то происходит переход в режим 1
+        if mode == 'mode_5':
+            mode = 'mode_1'
 
         # Блок команд отрисовки
         draw_cells()
@@ -126,6 +170,13 @@ def draw_avl_moves():
 def draw_msg():
     if not msg:
         return
+    font = pygame.font.Font(None, 56)
+    msg_surface = font.render(msg, 1, MSG_COLOR)
+    x_pos = CELL_SIZE * 4 - msg_surface.get_width() // 2
+    y_pos = CELL_SIZE * 4 - msg_surface.get_height() // 2
+    msg_rect = msg_surface.get_rect(topleft=(x_pos, y_pos))
+
+    surface.blit(msg_surface, msg_rect)
 
 
 # Функция определяет клетку, которую выбрал игрок
@@ -137,8 +188,8 @@ def get_mouse_selected_cell(mouse_event):
 
 # Функция определяет фигуру, которую выбрал игрок
 def get_mouse_selected_figure(mouse_event, side=None):
-    cell = get_mouse_selected_cell(mouse_event)
-    figure = board.get_figure(cell[0], cell[1])
+    selected_row, selected_col = get_mouse_selected_cell(mouse_event)
+    figure = board.get_figure(selected_row, selected_col)
     if side is not None and figure is not None:
         if figure.side != side:
             return None

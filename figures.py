@@ -176,7 +176,7 @@ class Pawn(Figure):
                         result.append((r2, c))
 
         if PAWN_TAKES in args or not args:
-            # Ищем взятия (за исключением взятия на проходе) и защиты
+            # Ищем взятия (за исключением взятия на проходе, которое требует информации о предыдущем ходе) и защиты
             offsets = (-1, 1)
             r1 = self.row + self.direction
             for offset in offsets:

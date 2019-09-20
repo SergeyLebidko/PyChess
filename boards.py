@@ -74,14 +74,17 @@ class Board:
         # У пешек есть ряд отличительных особенностей, которые необходимо учитывать при получении доступных ходов:
         # - только пешки бьют и ходят на разные поля
         # - только у пешек есть взятие на проходе
-        # - только пешка может превратиться в другую фигуру при достижении края поля
+        # - только пешка может превратиться в другую фигуру при достижении края поля (в том числе при взятии)
         # Поэтому код создания ходов для пешек отличается от кода создания ходов для других фигур
         if figure_type == Pawn:
-            # Создаем обычные ходы пешки
+            # Создаем обычные ходы и ход-конверсию при обычном ходе
             actions = figure.get_actions(PAWN_MOVES)
             for new_row, new_col in actions:
-                moves.append(self.create_normal_move(figure, new_row, new_col))
-            # Создаем взятия
+                if new_row == 0 or new_row == 7:
+                    moves.append(self.create_conversion_move(figure, new_row, new_col))
+                else:
+                    moves.append(self.create_normal_move(figure, new_row, new_col))
+            # Создаем взятия и ход-конверсию при взятии
             actions = figure.get_actions(PAWN_TAKES)
             for new_row, new_col in actions:
                 drop_figure = self.get_figure(new_row, new_col)
@@ -89,10 +92,13 @@ class Board:
                     continue
                 if drop_figure.side == figure.side:
                     continue
-                moves.append(self.create_take_move(figure, new_row, new_col))
+                if new_row == 0 or new_row == 7:
+                    moves.append(self.create_conversion_move(figure, new_row, new_col))
+                else:
+                    moves.append(self.create_take_move(figure, new_row, new_col))
+
             # Здесь необходимо вставить код создания ходов:
             # - взятия на проходе
-            # - превращения пешки в другую фигуру при достижении края доски
 
         # Получаем ходы других фигур
         if figure_type != Pawn:
@@ -134,6 +140,18 @@ class Board:
         move.drop_figure = self.get_figure(new_row, new_col)
         return move
 
+    # Метод создает ход-конверсию
+    def create_conversion_move(self, figure, new_row, new_col):
+        move = Move(CONVERSION)
+        move.figure = figure
+        move.old_row = figure.row
+        move.old_col = figure.col
+        move.new_row = new_row
+        move.new_col = new_col
+        move.drop_figure = self.get_figure(new_row, new_col)
+        move.new_figure = None
+        return move
+
     # Метод применяет переданный ход и вносит его в список совершенных ходов
     def apply_move(self, move):
         # Вносим применяемый ход в список ходов
@@ -151,6 +169,19 @@ class Board:
             move.drop_figure.is_drop = True
             return
 
+        # Ход-конверсия
+        if move.m_type == CONVERSION:
+            move.figure.set_pos(move.new_row, move.new_col)
+            move.figure.is_drop = True
+            if move.drop_figure is not None:
+                move.drop_figure.is_drop = True
+            if move.new_figure.side == self.pl_side:
+                self.pl_figures.append(move.new_figure)
+                return
+            if move.new_figure.side == self.cmp_side:
+                self.cmp_figures.append(move.new_figure)
+                return
+
     # Метод откатывает последний ход из списка совершенных ходов
     def cancel_move(self):
         if len(self.move_list) == 0:
@@ -167,11 +198,11 @@ class Board:
 
 class SelectorBoard:
 
-    def __init__(self, side):
-        self.queen = Queen(3, 3, side, self)
-        self.rook = Rook(3, 4, side, self)
-        self.bishop = Bishop(4, 3, side, self)
-        self.knight = Knight(4, 4, side, self)
+    def __init__(self, side, main_board):
+        self.queen = Queen(3, 3, side, main_board)
+        self.rook = Rook(3, 4, side, main_board)
+        self.bishop = Bishop(4, 3, side, main_board)
+        self.knight = Knight(4, 4, side, main_board)
 
     def get_figure(self, r, c):
         if r == 3 and c == 3:
