@@ -1,5 +1,6 @@
 from boards import *
 from params import *
+from ai import *
 
 # Текущий холст
 surface = None
@@ -16,9 +17,6 @@ avl_moves = []
 # Выбранный ход
 selected_move = None
 
-# Текущий режим работы
-mode = 'mode_1'
-
 # Сообщение
 msg = None
 
@@ -30,8 +28,24 @@ def start(player_side):
     surface = pygame.display.set_mode((CELL_SIZE * 8, CELL_SIZE * 8))
     clock = pygame.time.Clock()
 
+    # Определяем фигруры (белые или черные), которыми будем играть компьютер
+    if player_side == WHITE:
+        computer_side = BLACK
+    if player_side == BLACK:
+        computer_side = WHITE
+
+    # Если компьютер играет белыми, то его ход должен быть первым, иначе - первым ходит игрок
+    if computer_side == WHITE:
+        mode = 'mode_5'
+    else:
+        mode = 'mode_1'
+
+    # Создаем игровое поле
     main_board = Board(player_side)
     board = main_board
+
+    # Создаем объект, отвечающий за расчет ответного хода
+    ai = Ai(computer_side, main_board)
 
     while True:
         # Обрабатываем события

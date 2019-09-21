@@ -64,6 +64,25 @@ class Board:
         # Создаем список сделанных во время игры ходов
         self.move_list = []
 
+    # Метод возвращает все доступные ходы для выбранных фигур (белых или черных)
+    def get_all_avl_moves(self, side):
+        # Определяем набор фигур, для которого будем получать доступные ходы
+        if side == self.pl_side:
+            work_list = self.pl_figures
+        if side == self.cmp_side:
+            work_list = self.cmp_figures
+
+        # Перебираем фигуры из набора
+        result = []
+        for figure in work_list:
+            if figure.is_drop:
+                continue
+            avl_moves = self.get_avl_moves_for_figure(figure)
+            result += avl_moves
+
+        # Возвращаем результат
+        return result
+
     # Метод возвращает список доступных для данной фигуры ходов
     def get_avl_moves_for_figure(self, figure):
         # Список ходов, который будем формировать
