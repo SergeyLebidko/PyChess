@@ -118,6 +118,7 @@ def start(player_side):
         # В этом режиме происходит процесс применения хода игрока и проверка условия завешения игры
         if mode == 'mode_4':
             board.apply_move(selected_move)
+            selected_figure = None
             selected_move = None
             avl_moves = []
             # Вставить код проверки завершения игры
@@ -129,6 +130,14 @@ def start(player_side):
         # Если игра завершена, то происходит переход в режим 6
         # Если игра не завершена, то происходит переход в режим 1
         if mode == 'mode_5':
+            move = ai.get_next_move()
+            board.apply_move(move)
+            selected_figure = None
+            selected_move = None
+            avl_moves = []
+            # Вставить код проверки завершения игры
+            # Если игра завершена, то перейти в режим 6
+            # Если игра не завершена, то перейтив режим 1
             mode = 'mode_1'
 
         # Блок команд отрисовки

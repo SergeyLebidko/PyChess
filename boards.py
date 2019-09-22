@@ -41,28 +41,32 @@ class Board:
             self.cmp_figures.append(Pawn(1, i, self.cmp_side, self))
 
         # Создаем фигуры игрока
-        if self.cmp_side == WHITE:
+        if self.pl_side == BLACK:
             self.pl_king = King(7, 3, self.pl_side, self)
-            self.cmp_figures.append(self.pl_king)
-            self.cmp_figures.append(Queen(7, 4, self.pl_side, self))
+            self.pl_figures.append(self.pl_king)
+            self.pl_figures.append(Queen(7, 4, self.pl_side, self))
 
-        if self.cmp_side == BLACK:
+        if self.pl_side == WHITE:
             self.pl_king = King(7, 4, self.pl_side, self)
-            self.cmp_figures.append(self.pl_king)
-            self.cmp_figures.append(Queen(7, 3, self.pl_side, self))
+            self.pl_figures.append(self.pl_king)
+            self.pl_figures.append(Queen(7, 3, self.pl_side, self))
 
-        self.cmp_figures.append(Rook(7, 0, self.pl_side, self))
-        self.cmp_figures.append(Rook(7, 7, self.pl_side, self))
-        self.cmp_figures.append(Knight(7, 1, self.pl_side, self))
-        self.cmp_figures.append(Knight(7, 6, self.pl_side, self))
-        self.cmp_figures.append(Bishop(7, 2, self.pl_side, self))
-        self.cmp_figures.append(Bishop(7, 5, self.pl_side, self))
+        self.pl_figures.append(Rook(7, 0, self.pl_side, self))
+        self.pl_figures.append(Rook(7, 7, self.pl_side, self))
+        self.pl_figures.append(Knight(7, 1, self.pl_side, self))
+        self.pl_figures.append(Knight(7, 6, self.pl_side, self))
+        self.pl_figures.append(Bishop(7, 2, self.pl_side, self))
+        self.pl_figures.append(Bishop(7, 5, self.pl_side, self))
 
         for i in range(0, 8):
-            self.cmp_figures.append(Pawn(6, i, self.pl_side, self))
+            self.pl_figures.append(Pawn(6, i, self.pl_side, self))
 
         # Создаем список сделанных во время игры ходов
         self.move_list = []
+
+    # Метод возвращает количество сделанных ходов
+    def get_moves_count(self):
+        return len(self.move_list)
 
     # Метод возвращает все доступные ходы для выбранных фигур (белых или черных)
     def get_all_avl_moves(self, side):
