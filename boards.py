@@ -11,10 +11,7 @@ class Board:
 
     def __init__(self, pl_side):
         self.pl_side = pl_side
-        if pl_side == WHITE:
-            self.cmp_side = BLACK
-        if pl_side == BLACK:
-            self.cmp_side = WHITE
+        self.cmp_side = OPPOSITE_SIDE[pl_side]
 
         self.pl_figures = []
         self.cmp_figures = []
@@ -133,7 +130,7 @@ class Board:
                             if r0 < r1 < r2 and c1 == c:
                                 moves.append(self.create_passed_take_move(figure, r1, c1, last_move.figure))
 
-        # проверяем возможность рокировки
+        # Проверяем возможность рокировки
         if figure_type == King:
             pass
 

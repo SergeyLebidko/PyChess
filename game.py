@@ -29,10 +29,7 @@ def start(player_side):
     clock = pygame.time.Clock()
 
     # Определяем фигруры (белые или черные), которыми будем играть компьютер
-    if player_side == WHITE:
-        computer_side = BLACK
-    if player_side == BLACK:
-        computer_side = WHITE
+    computer_side = OPPOSITE_SIDE[player_side]
 
     # Если компьютер играет белыми, то его ход должен быть первым, иначе - первым ходит игрок
     if computer_side == WHITE:

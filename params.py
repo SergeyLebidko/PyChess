@@ -5,6 +5,9 @@ FPS = 5
 WHITE = 'white'
 BLACK = 'black'
 
+# Словарь для быстрого определения противоположной стороны
+OPPOSITE_SIDE = {WHITE: BLACK, BLACK: WHITE}
+
 # Ширина/высота клетки в пикселях
 CELL_SIZE = 50
 
