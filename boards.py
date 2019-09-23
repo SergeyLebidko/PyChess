@@ -3,8 +3,13 @@ from figures import *
 
 class Move:
 
-    def __init__(self, move_type):
+    def __init__(self, move_type, figure, new_row, new_col):
         self.m_type = move_type
+        self.figure = figure
+        self.new_row = new_row
+        self.new_col = new_col
+        self.old_row = figure.row
+        self.old_col = figure.col
 
 
 class Board:
@@ -207,33 +212,18 @@ class Board:
     # Метод создает обычный ход
     @staticmethod
     def create_normal_move(figure, new_row, new_col):
-        move = Move(NORMAL_MOVE)
-        move.figure = figure
-        move.old_row = figure.row
-        move.old_col = figure.col
-        move.new_row = new_row
-        move.new_col = new_col
+        move = Move(NORMAL_MOVE, figure, new_row, new_col)
         return move
 
     # Метод создает ход-взятие
     def create_take_move(self, figure, new_row, new_col):
-        move = Move(TAKE_MOVE)
-        move.figure = figure
-        move.old_row = figure.row
-        move.old_col = figure.col
-        move.new_row = new_row
-        move.new_col = new_col
+        move = Move(TAKE_MOVE, figure, new_row, new_col)
         move.drop_figure = self.get_figure(new_row, new_col)
         return move
 
     # Метод создает ход-конверсию
     def create_conversion_move(self, figure, new_row, new_col):
-        move = Move(CONVERSION)
-        move.figure = figure
-        move.old_row = figure.row
-        move.old_col = figure.col
-        move.new_row = new_row
-        move.new_col = new_col
+        move = Move(CONVERSION, figure, new_row, new_col)
         move.drop_figure = self.get_figure(new_row, new_col)
         move.new_figure = None
         return move
@@ -241,24 +231,14 @@ class Board:
     # Метод создает код взятия на проходе
     @staticmethod
     def create_passed_take_move(figure, new_row, new_col, drop_figure):
-        move = Move(PASSED_TAKE)
-        move.figure = figure
-        move.old_row = figure.row
-        move.old_col = figure.col
-        move.new_row = new_row
-        move.new_col = new_col
+        move = Move(PASSED_TAKE, figure, new_row, new_col)
         move.drop_figure = drop_figure
         return move
 
     # Метод создает ход-рокировку
-    def create_castling_move(self, figure, new_row_figure, new_col_figure, rook, new_row_rook, new_col_rook):
-        move = Move(CASTLING)
-        # Фиксируем старое и новое положение короля
-        move.figure = figure
-        move.old_row = figure.row
-        move.old_col = figure.col
-        move.new_row = new_row_figure
-        move.new_col = new_col_figure
+    @staticmethod
+    def create_castling_move(figure, new_row_figure, new_col_figure, rook, new_row_rook, new_col_rook):
+        move = Move(CASTLING, figure, new_row_figure, new_col_figure)
 
         # Фиксируем старое и новое положение ладьи
         move.rook = rook
