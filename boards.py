@@ -130,7 +130,37 @@ class Board:
 
         # Проверяем возможность рокировки
         if figure_type == King:
-            pass
+            # Для выполнения рокировки должно быть выполнено множество условий
+            # Первое условие - король не должен до рокировки совершать ход
+            if not self.was_move(figure):
+                # Второе условие - король не должен находится под шахом (то есть поле короля не должно быть "битым")
+                if not self.is_strike_cell(figure.row, figure.col, OPPOSITE_SIDE[figure.side]):
+
+                    # Проверяем возможность рокировки с ладьёй слева
+                    l_rook = self.get_figure(figure.row, 0)
+                    if type(l_rook) == Rook:
+                        # Третье условие - ладья не должна ходить
+                        if not self.was_move(l_rook):
+                            # Получаем список клеток между ладьёй и королем
+                            cell_list = [(figure.row, 1), (figure.row, 2)]
+                            if figure.col == 4:
+                                cell_list.append((figure.row, 3))
+                            # Четвертое и пятое условия:
+                            # - на клетках между ладьёи королем не должно быть фигур
+                            # - эти клетки не должны находиться по ударом
+                            # Предполагаем, что эти условия соблюдены и выставляем соответствующее значение flag
+                            allowed_cells_flag = True
+                            for row_cell, col_cell in cell_list:
+                                figure_on_cell = self.get_figure(row_cell, col_cell)
+                                if figure_on_cell is not None or self.is_strike_cell(row_cell, col_cell,
+                                                                                     OPPOSITE_SIDE[figure.side]):
+                                    allowed_cells_flag = False
+                                    break
+                            # Если все необходимые условия соблюдены, создаем рокировку
+                            if allowed_cells_flag:
+                                moves.append(
+                                    self.create_castling_move(figure, figure.row, figure.col - 2, l_rook, figure.row,
+                                                              figure.col - 1))
 
         # Получаем ходы других фигур
         if figure_type != Pawn:
@@ -182,6 +212,7 @@ class Board:
         move.new_figure = None
         return move
 
+    # Метод создает код взятия на проходе
     @staticmethod
     def create_passed_take_move(figure, new_row, new_col, drop_figure):
         move = Move(PASSED_TAKE)
@@ -191,6 +222,26 @@ class Board:
         move.new_row = new_row
         move.new_col = new_col
         move.drop_figure = drop_figure
+        return move
+
+    # Метод создает ход-рокировку
+    def create_castling_move(self, figure, new_row_figure, new_col_figure, rook, new_row_rook, new_col_rook):
+        move = Move(CASTLING)
+        # Фиксируем старое и новое положение короля
+        move.figure = figure
+        move.old_row = figure.row
+        move.old_col = figure.col
+        move.new_row = new_row_figure
+        move.new_col = new_col_figure
+
+        # Фиксируем старое и новое положение ладьи
+        move.rook = rook
+        move.old_row_rook = rook.row
+        move.old_col_rook = rook.col
+        move.new_row_rook = new_row_rook
+        move.new_col_rook = new_col_rook
+
+        # Возвращаем созданнй ход
         return move
 
     # Метод применяет переданный ход и вносит его в список совершенных ходов
@@ -223,11 +274,42 @@ class Board:
                 self.cmp_figures.append(move.new_figure)
                 return
 
-    # Метод откатывает последний ход из списка совершенных ходов
+        # Рокировка
+        if move.m_type == CASTLING:
+            move.figure.set_pos(move.new_row, move.new_col)
+            move.rook.set_pos(move.new_row_rook, move.new_col_rook)
+            return
+
+            # Метод откатывает последний ход из списка совершенных ходов
+
     def cancel_move(self):
         if len(self.move_list) == 0:
             return
         pass
+
+    # Метод возвращает True, если поле (row, col) находится под ударом фигур стороны side
+    def is_strike_cell(self, row, col, side):
+        work_list = self.figures_dict[side]
+        for figure in work_list:
+            if figure.is_drop:
+                continue
+            figure_type = type(figure)
+            if figure_type == Pawn:
+                actions = figure.get_actions(PAWN_TAKES)
+            else:
+                actions = figure.get_actions()
+            for r, c in actions:
+                if r == row and c == col:
+                    return True
+
+        return False
+
+    # Метод возвращает True, если фигура уже ходила
+    def was_move(self, figure):
+        for move in self.move_list:
+            if figure == move.figure:
+                return True
+        return False
 
     # Метод возвращает фигуру, стоящую на клетке r, c
     def get_figure(self, r, c):
