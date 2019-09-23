@@ -77,6 +77,35 @@ class Board:
         # Создаем список сделанных во время игры ходов
         self.move_list = []
 
+        # Создаем данные, необходимые для оценки позиции
+        self.values_figure = {
+            Pawn: 10,
+            Knight: 30,
+            Bishop: 30,
+            Rook: 50,
+            Queen: 90,
+            King: 900
+        }
+
+    # Метод возвращает оценку позиции на доске с точки зрения стороны side
+    def position_evaluation(self, side):
+        work_list = self.figures_dict[side]
+        eval_side = 0
+        for figure in work_list:
+            if figure.is_drop:
+                continue
+            eval_side += self.values_figure[type(figure)]
+
+        work_list = self.figures_dict[OPPOSITE_SIDE[side]]
+        eval_opp_side = 0
+        for figure in work_list:
+            if figure.is_drop:
+                continue
+            eval_opp_side += self.values_figure[type(figure)]
+
+        # Возвращаем оценку позиции
+        return eval_side - eval_opp_side
+
     # Метод возвращает количество сделанных ходов
     def get_moves_count(self):
         return len(self.move_list)
@@ -317,7 +346,7 @@ class Board:
 
     # Метод производит откат последнего хода из списка ходов
     def cancel_move(self):
-        if len(self.move_list) == 0:
+        if self.get_moves_count() == 0:
             return
 
         # Получаем последний ход
