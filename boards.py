@@ -15,6 +15,7 @@ class Board:
 
         self.pl_figures = []
         self.cmp_figures = []
+        self.figures_dict = {self.pl_side: self.pl_figures, self.cmp_side: self.cmp_figures}
 
         # Создаем фигуры компьютера
         if self.cmp_side == WHITE:
@@ -68,10 +69,7 @@ class Board:
     # Метод возвращает все доступные ходы для выбранных фигур (белых или черных)
     def get_all_avl_moves(self, side):
         # Определяем набор фигур, для которого будем получать доступные ходы
-        if side == self.pl_side:
-            work_list = self.pl_figures
-        if side == self.cmp_side:
-            work_list = self.cmp_figures
+        work_list = self.figures_dict[side]
 
         # Перебираем фигуры из набора
         result = []
