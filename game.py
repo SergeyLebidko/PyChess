@@ -52,6 +52,8 @@ def start(player_side):
                 exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button != 1:
+                    # Тестовый код отката хода при нажатии на любую кнопку мыши, кроме левой
+                    board.cancel_move()
                     continue
 
                 # В режиме 1 разрешен только выбор фигур

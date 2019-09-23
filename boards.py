@@ -18,8 +18,11 @@ class Board:
         self.pl_side = pl_side
         self.cmp_side = OPPOSITE_SIDE[pl_side]
 
+        # Списки фигур игрока и компьютера
         self.pl_figures = []
         self.cmp_figures = []
+
+        # Словарь, позволяющий быстро найти список фигур по их цвету
         self.figures_dict = {self.pl_side: self.pl_figures, self.cmp_side: self.cmp_figures}
 
         # Создаем фигуры компьютера
@@ -273,12 +276,7 @@ class Board:
             move.figure.is_drop = True
             if move.drop_figure is not None:
                 move.drop_figure.is_drop = True
-            if move.new_figure.side == self.pl_side:
-                self.pl_figures.append(move.new_figure)
-                return
-            if move.new_figure.side == self.cmp_side:
-                self.cmp_figures.append(move.new_figure)
-                return
+            self.figures_dict[move.new_figure.side].append(move.new_figure)
 
         # Рокировка
         if move.m_type == CASTLING:
@@ -291,7 +289,36 @@ class Board:
     def cancel_move(self):
         if len(self.move_list) == 0:
             return
-        pass
+
+        # Получаем последний ход
+        last_move = self.move_list.pop(-1)
+
+        # Если откатываем обычный ход
+        if last_move.m_type == NORMAL_MOVE:
+            last_move.figure.set_pos(last_move.old_row, last_move.old_col)
+            return
+
+        # Если откатываем ход-взятие или ход-взятие на проходе
+        if last_move.m_type == TAKE_MOVE or last_move.m_type == PASSED_TAKE:
+            last_move.figure.set_pos(last_move.old_row, last_move.old_col)
+            last_move.drop_figure.is_drop = False
+            return
+
+        # Если откатываем ход-конверсию
+        if last_move.m_type == CONVERSION:
+            last_move.figure.set_pos(last_move.old_row, last_move.old_col)
+            last_move.figure.is_drop = False
+            if last_move.drop_figure is not None:
+                last_move.drop_figure.is_drop = False
+            work_list = self.figures_dict[last_move.new_figure.side]
+            work_list.remove(last_move.new_figure)
+            return
+
+        # Если откатываем рокировку
+        if last_move.m_type == CASTLING:
+            last_move.figure.set_pos(last_move.old_row, last_move.old_col)
+            last_move.rook.set_pos(last_move.old_row_rook, last_move.old_col_rook)
+            return
 
     # Метод возвращает True, если поле (row, col) находится под ударом фигур стороны side
     def is_strike_cell(self, row, col, side):
