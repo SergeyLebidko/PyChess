@@ -17,12 +17,15 @@ avl_moves = []
 # Выбранный ход
 selected_move = None
 
+# Равен True, если король игрока находится под шахом
+shah_flag = False
+
 # Сообщение
 msg = None
 
 
 def start(player_side):
-    global surface, board, selected_figure, avl_moves, selected_move, mode, msg
+    global surface, board, selected_figure, avl_moves, selected_move, mode, shah_flag, msg
     pygame.init()
     pygame.display.set_caption('PyChess')
     surface = pygame.display.set_mode((CELL_SIZE * 8, CELL_SIZE * 8))
@@ -113,15 +116,30 @@ def start(player_side):
                 if mode == 'mode_6':
                     exit()
 
-        # Режим 4 не связан с событиями мыши ил клавиатуры
+        # Режим 4 не связан с событиями мыши или клавиатуры
         # В этом режиме происходит процесс применения хода игрока и проверка условия завешения игры
         if mode == 'mode_4':
             board.apply_move(selected_move)
             selected_figure = None
             selected_move = None
             avl_moves = []
-            # Вставить код проверки завершения игры
+
+            # Сбрасываем флаг шаха игроку. Это можно делать, так как ходы игрока, которые приводили бы
+            # к шаху ему же самому - запрещены и отсекаются фильтром ходов в board
+            shah_flag = False
+
+            # Код проверки завершения игры
             # Если игра завершена, то перейти в режим 6
+            game_over = check_game_over(computer_side)
+            if game_over == MAT:
+                msg = 'Вы победили!'
+                mode = 'mode_6'
+                continue
+            if game_over == PAT:
+                msg = 'Ничья'
+                mode = 'mode_6'
+                continue
+
             # Если игра не завершена, то перейти в режим 5
             mode = 'mode_5'
 
@@ -134,8 +152,23 @@ def start(player_side):
             selected_figure = None
             selected_move = None
             avl_moves = []
-            # Вставить код проверки завершения игры
+
+            # Проверяем, установлен ли шах королю игрока
+            if board.is_strike_figure(board.pl_king):
+                shah_flag = True
+
+            # Код проверки завершения игры
             # Если игра завершена, то перейти в режим 6
+            game_over = check_game_over(player_side)
+            if game_over == MAT:
+                msg = 'Вы проиграли...'
+                mode = 'mode_6'
+                continue
+            if game_over == PAT:
+                msg = 'Ничья'
+                mode = 'mode_6'
+                continue
+
             # Если игра не завершена, то перейтив режим 1
             mode = 'mode_1'
 
@@ -143,11 +176,24 @@ def start(player_side):
         draw_cells()
         draw_select_cell()
         draw_avl_moves()
+        draw_shah_cell()
         draw_figures()
         draw_msg()
         pygame.display.update()
 
         clock.tick(FPS)
+
+
+# Функция проверяет, завершалась ли игра для данной стороны
+def check_game_over(side):
+    king = board.kings_dict[side]
+    sh_flag = board.is_strike_figure(king)
+    avl_flag = (len(board.get_all_avl_moves(side)) == 0)
+    if avl_flag and sh_flag:
+        return MAT
+    if avl_flag and not sh_flag:
+        return PAT
+    return None
 
 
 # Функция отрисовывает клетки доски
@@ -186,6 +232,15 @@ def draw_avl_moves():
         pygame.draw.rect(surface, AVL_MOVE_CELL_COLOR,
                          (col_move * CELL_SIZE + 4, row_move * CELL_SIZE + 4, CELL_SIZE - 8, CELL_SIZE - 8))
     pass
+
+
+# Функция отрисовывает клетку короля игрока, если он находится под шахом
+def draw_shah_cell():
+    if shah_flag:
+        row = board.pl_king.row
+        col = board.pl_king.col
+        pygame.draw.rect(surface, KING_ON_SHAH_COLOR,
+                         (col * CELL_SIZE + 4, row * CELL_SIZE + 4, CELL_SIZE - 8, CELL_SIZE - 8))
 
 
 # Функция отрисовки сообщения
