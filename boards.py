@@ -107,6 +107,7 @@ class Board:
                     moves.append(self.create_conversion_move(figure, new_row, new_col))
                 else:
                     moves.append(self.create_normal_move(figure, new_row, new_col))
+
             # Создаем взятия и ход-конверсию при взятии
             actions = figure.get_actions(PAWN_TAKES)
             for new_row, new_col in actions:
@@ -120,8 +121,21 @@ class Board:
                 else:
                     moves.append(self.create_take_move(figure, new_row, new_col))
 
-            # Здесь необходимо вставить код создания ходов:
-            # - взятия на проходе
+            # Создаем ход взятия на проходе
+            if self.get_moves_count() > 0:
+                last_move = self.move_list[-1]
+                if type(last_move.figure) == Pawn and last_move.figure.side != figure.side:
+                    r0 = min(last_move.new_row, last_move.old_row)
+                    r2 = max(last_move.new_row, last_move.old_row)
+                    if (r2 - r0) == 2:
+                        c = last_move.new_col
+                        for r1, c1 in actions:
+                            if r0 < r1 < r2 and c1 == c:
+                                moves.append(self.create_passed_take_move(figure, r1, c1, last_move.figure))
+
+        # проверяем возможность рокировки
+        if figure_type == King:
+            pass
 
         # Получаем ходы других фигур
         if figure_type != Pawn:
@@ -133,8 +147,6 @@ class Board:
                     continue
                 if drop_figure.side != figure.side:
                     moves.append(self.create_take_move(figure, new_row, new_col))
-
-        # Здесь необходимо вставить код проверки возможности и создания рокировки, если figure_type == King
 
         # Здесь необходимо вставить код отсечения ходов, ведущих к шаху
 
@@ -175,6 +187,17 @@ class Board:
         move.new_figure = None
         return move
 
+    @staticmethod
+    def create_passed_take_move(figure, new_row, new_col, drop_figure):
+        move = Move(PASSED_TAKE)
+        move.figure = figure
+        move.old_row = figure.row
+        move.old_col = figure.col
+        move.new_row = new_row
+        move.new_col = new_col
+        move.drop_figure = drop_figure
+        return move
+
     # Метод применяет переданный ход и вносит его в список совершенных ходов
     def apply_move(self, move):
         # Вносим применяемый ход в список ходов
@@ -186,8 +209,8 @@ class Board:
             move.figure.set_pos(move.new_row, move.new_col)
             return
 
-        # Ход-взятие
-        if move.m_type == TAKE_MOVE:
+        # Ход-взятие или код-взятие на проходе (алгоритм их выполнения одинаков)
+        if move.m_type == TAKE_MOVE or move.m_type == PASSED_TAKE:
             move.figure.set_pos(move.new_row, move.new_col)
             move.drop_figure.is_drop = True
             return
