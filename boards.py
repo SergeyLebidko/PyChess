@@ -25,14 +25,19 @@ class Board:
         # Словарь, позволяющий быстро найти список фигур по их цвету
         self.figures_dict = {self.pl_side: self.pl_figures, self.cmp_side: self.cmp_figures}
 
+        # Словарь, позволяющий быстро найти короля по его цвету
+        self.kings_dict = {}
+
         # Создаем фигуры компьютера
         if self.cmp_side == WHITE:
             self.cmp_king = King(0, 3, self.cmp_side, self)
+            self.kings_dict[WHITE] = self.cmp_king
             self.cmp_figures.append(self.cmp_king)
             self.cmp_figures.append(Queen(0, 4, self.cmp_side, self))
 
         if self.cmp_side == BLACK:
             self.cmp_king = King(0, 4, self.cmp_side, self)
+            self.kings_dict[BLACK] = self.cmp_king
             self.cmp_figures.append(self.cmp_king)
             self.cmp_figures.append(Queen(0, 3, self.cmp_side, self))
 
@@ -49,11 +54,13 @@ class Board:
         # Создаем фигуры игрока
         if self.pl_side == BLACK:
             self.pl_king = King(7, 3, self.pl_side, self)
+            self.kings_dict[BLACK] = self.pl_king
             self.pl_figures.append(self.pl_king)
             self.pl_figures.append(Queen(7, 4, self.pl_side, self))
 
         if self.pl_side == WHITE:
             self.pl_king = King(7, 4, self.pl_side, self)
+            self.kings_dict[WHITE] = self.pl_king
             self.pl_figures.append(self.pl_king)
             self.pl_figures.append(Queen(7, 3, self.pl_side, self))
 
@@ -208,6 +215,28 @@ class Board:
                     moves.append(self.create_take_move(figure, new_row, new_col))
 
         # Здесь необходимо вставить код отсечения ходов, ведущих к шаху
+        avl_moves = []
+        king = self.kings_dict[figure.side]
+        for move in moves:
+            # Для хода-конверсии создаем фиктивного ферзя
+            if move.m_type == CONVERSION:
+                move.new_figure = Queen(move.new_row, move.new_col, figure.side, self)
+
+            # Применяем ход
+            self.apply_move(move)
+
+            # Проверяем, не находится ли король под ударом
+            if not self.is_strike_figure(king):
+                avl_moves.append(move)
+
+            # Откатываем ход
+            self.cancel_move()
+
+            # Для хода-конверсии удаляем фиктивного ферзя
+            if move.m_type == CONVERSION:
+                move.new_figure = None
+
+        moves = avl_moves
 
         # Возвращаем результат
         return moves
@@ -286,6 +315,7 @@ class Board:
 
             # Метод откатывает последний ход из списка совершенных ходов
 
+    # Метод производит откат последнего хода из списка ходов
     def cancel_move(self):
         if len(self.move_list) == 0:
             return
@@ -336,6 +366,10 @@ class Board:
                     return True
 
         return False
+
+    # Метод возвращает True, если фигрура находится под ударом фигур противоположной стороны
+    def is_strike_figure(self, figure):
+        return self.is_strike_cell(figure.row, figure.col, OPPOSITE_SIDE[figure.side])
 
     # Метод возвращает True, если фигура уже ходила
     def was_move(self, figure):
