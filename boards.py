@@ -141,7 +141,7 @@ class Board:
                     if type(l_rook) == Rook:
                         # Третье условие - ладья не должна ходить
                         if not self.was_move(l_rook):
-                            # Получаем список клеток между ладьёй и королем
+                            # Получаем список клеток между ладьёй и королём
                             cell_list = [(figure.row, 1), (figure.row, 2)]
                             if figure.col == 4:
                                 cell_list.append((figure.row, 3))
@@ -162,7 +162,33 @@ class Board:
                                     self.create_castling_move(figure, figure.row, figure.col - 2, l_rook, figure.row,
                                                               figure.col - 1))
 
-        # Получаем ходы других фигур
+                    # Проверяем возможность рокировки с ладьёй справа
+                    r_rook = self.get_figure(figure.row, 7)
+                    if type(r_rook) == Rook:
+                        # Третье условие - ладья не должна ходить
+                        if not self.was_move(r_rook):
+                            # Получаем список клеток между ладьёй и королём
+                            cell_list = [(figure.row, 6), (figure.row, 5)]
+                            if figure.col == 3:
+                                cell_list.append((figure.row, 4))
+                            # Четвертое и пятое условия:
+                            # - на клетках между ладьёи королем не должно быть фигур
+                            # - эти клетки не должны находиться по ударом
+                            # Предполагаем, что эти условия соблюдены и выставляем соответствующее значение flag
+                            allowed_cells_flag = True
+                            for row_cell, col_cell in cell_list:
+                                figure_on_cell = self.get_figure(row_cell, col_cell)
+                                if figure_on_cell is not None or self.is_strike_cell(row_cell, col_cell,
+                                                                                     OPPOSITE_SIDE[figure.side]):
+                                    allowed_cells_flag = False
+                                    break
+                            # Если все необходимые условия соблюдены, создаем рокировку
+                            if allowed_cells_flag:
+                                moves.append(
+                                    self.create_castling_move(figure, figure.row, figure.col + 2, r_rook, figure.row,
+                                                              figure.col + 1))
+
+        # Получаем ходы других фигур и короля (за исключением рокировки, являющейся особым ходом)
         if figure_type != Pawn:
             actions = figure.get_actions()
             for new_row, new_col in actions:
