@@ -14,15 +14,17 @@ class Ai:
         # Получаем список доступных ходов
         avl_moves = self.board.get_all_avl_moves(self.side)
 
-        # Первый ход выбирается компьютером случайным образом
         moves_count = self.board.get_moves_count()
+        random.seed()
+        random_move = avl_moves[random.randint(0, len(avl_moves) - 1)]
+
+        # Первый ход выбирается компьютером случайным образом
         if moves_count == 0 or moves_count == 1:
-            random.seed()
-            move = avl_moves[random.randint(0, len(avl_moves) - 1)]
-            return move
+            return random_move
 
         # Иначе нам нужно выбрать ход с максимальной оценкой
         max_rating = -sys.maxsize
+        move_with_max_rating = random_move
         for move in avl_moves:
             self.board.apply_move(move)
             rating = self.get_rating(2, 'max', self.side, max_rating)
