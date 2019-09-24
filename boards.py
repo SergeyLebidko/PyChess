@@ -194,7 +194,7 @@ class Board:
                 continue
             figure_type = type(figure)
             value_cmp_eval += self.values_figure[figure_type]
-            pos_cmp_eval += self.pos_cmp_dict[figure_type][figure.row][figure.col]
+            pos_cmp_eval += self.pos_cmp_dict[figure_type][figure.row][figure.col]*5
 
         # Получаем оценку фигур игрока
         value_pl_eval = 0
@@ -204,7 +204,7 @@ class Board:
                 continue
             figure_type = type(figure)
             value_pl_eval += self.values_figure[type(figure)]
-            pos_pl_eval += self.pos_pl_dict[figure_type][figure.row][figure.col]
+            pos_pl_eval += self.pos_pl_dict[figure_type][figure.row][figure.col]*5
 
         # Возвращаем оценку позиции
         return (value_cmp_eval + pos_cmp_eval) - (value_pl_eval + pos_pl_eval)
