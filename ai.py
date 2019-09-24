@@ -9,8 +9,6 @@ class Ai:
         self.side = side
         self.board = board
 
-        self.count = 0
-
     # Метод возвращает следующий ход компьютера
     def get_next_move(self):
         # Получаем список доступных ходов
@@ -24,12 +22,9 @@ class Ai:
             return move
 
         # Иначе нам нужно выбрать ход с максимальной оценкой
-        self.count = 0
-
         max_rating = -sys.maxsize
         for move in avl_moves:
             self.board.apply_move(move)
-            self.count += 1
             rating = self.get_rating(2, 'max', self.side, max_rating)
             self.board.cancel_move()
             if rating > max_rating:
@@ -37,7 +32,6 @@ class Ai:
                 move_with_max_rating = move
 
         # Возвращаем найденный ход
-        print('Просмотрено ходов: ', self.count)
         return move_with_max_rating
 
     # Метод возвращает оценку хода
@@ -48,27 +42,26 @@ class Ai:
         if d == 0:
             return self.board.position_evaluation()
 
-        if option == 'max':
-            rating = sys.maxsize
-        if option == 'min':
-            rating = -sys.maxsize
-
         avl_moves = self.board.get_all_avl_moves(OPPOSITE_SIDE[side])
-        for avl_move in avl_moves:
-            self.board.apply_move(avl_move)
-            self.count += 1
-            if option == 'max':
-                tmp_rating = self.get_rating(d - 1, 'min', OPPOSITE_SIDE[side], rating)
-                if tmp_rating < limit:
-                    self.board.cancel_move()
-                    break
-                rating = min(rating, tmp_rating)
-            if option == 'min':
-                tmp_rating = self.get_rating(d - 1, 'max', OPPOSITE_SIDE[side], rating)
-                if tmp_rating > limit:
-                    self.board.cancel_move()
-                    break
-                rating = max(rating, tmp_rating)
-            self.board.cancel_move()
 
-        return rating
+        if option == 'max':
+            min_rating = sys.maxsize
+            for avl_move in avl_moves:
+                self.board.apply_move(avl_move)
+                rating = self.get_rating(d - 1, 'min', OPPOSITE_SIDE[side], min_rating)
+                self.board.cancel_move()
+                min_rating = min(min_rating, rating)
+                if min_rating < limit:
+                    return min_rating
+            return min_rating
+
+        if option == 'min':
+            max_rating = -sys.maxsize
+            for avl_move in avl_moves:
+                self.board.apply_move(avl_move)
+                rating = self.get_rating(d - 1, 'max', OPPOSITE_SIDE[side], max_rating)
+                self.board.cancel_move()
+                max_rating = max(max_rating, rating)
+                if max_rating > limit:
+                    return max_rating
+            return max_rating
