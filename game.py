@@ -55,8 +55,6 @@ def start(player_side):
                 exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button != 1:
-                    # Тестовый код отката хода при нажатии на любую кнопку мыши, кроме левой
-                    board.cancel_move()
                     continue
 
                 # В режиме 1 разрешен только выбор фигур
@@ -177,18 +175,6 @@ def start(player_side):
         clock.tick(FPS)
 
 
-# Функция выполняет команды отрисовки
-def repaint():
-    # Блок команд отрисовки
-    draw_cells()
-    draw_select_cell()
-    draw_avl_moves()
-    draw_shah_cell()
-    draw_figures()
-    draw_msg()
-    pygame.display.update()
-
-
 # Функция проверяет, завершалась ли игра для данной стороны
 def check_game_over(side):
     king = board.kings_dict[side]
@@ -199,6 +185,18 @@ def check_game_over(side):
     if avl_flag and not sh_flag:
         return PAT
     return None
+
+
+# Функция выполняет команды отрисовки
+def repaint():
+    # Блок команд отрисовки
+    draw_cells()
+    draw_select_cell()
+    draw_avl_moves()
+    draw_shah_cell()
+    draw_figures()
+    draw_msg()
+    pygame.display.update()
 
 
 # Функция отрисовывает клетки доски

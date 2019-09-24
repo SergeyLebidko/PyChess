@@ -87,24 +87,24 @@ class Board:
             King: 900
         }
 
-    # Метод возвращает оценку позиции на доске с точки зрения стороны side
-    def position_evaluation(self, side):
-        work_list = self.figures_dict[side]
-        eval_side = 0
-        for figure in work_list:
+    # Метод возвращает оценку позиции на доске с точки зрения компьютера
+    def position_evaluation(self):
+        # Получаем стоимость фигур компьютера
+        cmp_eval = 0
+        for figure in self.cmp_figures:
             if figure.is_drop:
                 continue
-            eval_side += self.values_figure[type(figure)]
+            cmp_eval += self.values_figure[type(figure)]
 
-        work_list = self.figures_dict[OPPOSITE_SIDE[side]]
-        eval_opp_side = 0
-        for figure in work_list:
+        # получаем стоимость фигур игрока
+        pl_eval = 0
+        for figure in self.pl_figures:
             if figure.is_drop:
                 continue
-            eval_opp_side += self.values_figure[type(figure)]
+            pl_eval += self.values_figure[type(figure)]
 
         # Возвращаем оценку позиции
-        return eval_side - eval_opp_side
+        return cmp_eval - pl_eval
 
     # Метод возвращает количество сделанных ходов
     def get_moves_count(self):
