@@ -26,6 +26,8 @@ class Ai:
         max_rating = -sys.maxsize
         move_with_max_rating = random_move
         for move in avl_moves:
+            if move.m_type == CONVERSION:
+                move.new_figure = Queen(move.figure.new_row, move.figure.new_col, self.side, self.board)
             self.board.apply_move(move)
             rating = self.get_rating(2, 'max', self.side, max_rating)
             self.board.cancel_move()
@@ -49,6 +51,9 @@ class Ai:
         if option == 'max':
             min_rating = sys.maxsize
             for avl_move in avl_moves:
+                if avl_move.m_type == CONVERSION:
+                    avl_move.new_figure = Queen(avl_move.figure.new_row, avl_move.figure.new_col, OPPOSITE_SIDE[side],
+                                                self.board)
                 self.board.apply_move(avl_move)
                 rating = self.get_rating(d - 1, 'min', OPPOSITE_SIDE[side], min_rating)
                 self.board.cancel_move()
@@ -60,6 +65,9 @@ class Ai:
         if option == 'min':
             max_rating = -sys.maxsize
             for avl_move in avl_moves:
+                if avl_move.m_type == CONVERSION:
+                    avl_move.new_figure = Queen(avl_move.figure.new_row, avl_move.figure.new_col, OPPOSITE_SIDE[side],
+                                                self.board)
                 self.board.apply_move(avl_move)
                 rating = self.get_rating(d - 1, 'max', OPPOSITE_SIDE[side], max_rating)
                 self.board.cancel_move()
