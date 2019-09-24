@@ -142,6 +142,7 @@ def start(player_side):
 
             # Если игра не завершена, то перейти в режим 5
             mode = 'mode_5'
+            repaint()
 
         # В режиме 5 происходит вычисление ответного хода компьютера и проверка его результатов
         # Если игра завершена, то происходит переход в режим 6
@@ -172,16 +173,20 @@ def start(player_side):
             # Если игра не завершена, то перейтив режим 1
             mode = 'mode_1'
 
-        # Блок команд отрисовки
-        draw_cells()
-        draw_select_cell()
-        draw_avl_moves()
-        draw_shah_cell()
-        draw_figures()
-        draw_msg()
-        pygame.display.update()
-
+        repaint()
         clock.tick(FPS)
+
+
+# Функция выполняет команды отрисовки
+def repaint():
+    # Блок команд отрисовки
+    draw_cells()
+    draw_select_cell()
+    draw_avl_moves()
+    draw_shah_cell()
+    draw_figures()
+    draw_msg()
+    pygame.display.update()
 
 
 # Функция проверяет, завершалась ли игра для данной стороны

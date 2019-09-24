@@ -24,25 +24,34 @@ class Ai:
         max_rating = -1000000
         move_with_max_rating = None
         for move in avl_moves:
-            rating = self.get_rating(move)
+            self.board.apply_move(move)
+            rating = self.get_rating(self.side, 2)
+            self.board.cancel_move()
             if rating > max_rating:
                 max_rating = rating
                 move_with_max_rating = move
 
         # Возвращаем найденный ход
-        print()
         return move_with_max_rating
 
-    def get_rating(self, move):
-        # Применяем переданный ход
-        self.board.apply_move(move)
+    # Метод возвращает оценку хода. d - глубина рекурсии
+    def get_rating(self, side, d):
+        if d == 0:
+            # Получем оценку для примененного хода
+            evaluate = self.board.position_evaluation(side)
 
-        # Получем оценку для примененного хода
-        eval = self.board.position_evaluation(move.figure.side)
+            # Возвращаем результат
+            return evaluate
 
-        # Откатываем примененный ход
-        self.board.cancel_move()
+        rating = 0
+        max_rating = -1000000
+        avl_moves = self.board.get_all_avl_moves(OPPOSITE_SIDE[side])
+        for avl_move in avl_moves:
+            self.board.apply_move(avl_move)
+            rating = (-1) * self.get_rating(OPPOSITE_SIDE[side], d - 1)
+            self.board.cancel_move()
+            if rating > max_rating:
+                max_rating = rating
 
         # Возвращаем результат
-        print(eval)
-        return eval
+        return max_rating
