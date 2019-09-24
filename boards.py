@@ -88,7 +88,7 @@ class Board:
         }
 
         # Веса позиций
-        self.values_pos_pl_king = [
+        self.pos_pl_king = [
             [25, 25, 21, 15, 15, 21, 25, 25],
             [21, 21, 17, 13, 13, 17, 21, 21],
             [13, 13,  5,  5,  5,  5, 13, 13],
@@ -99,7 +99,7 @@ class Board:
             [25, 25, 21, 15, 15, 21, 25, 25]
         ]
 
-        self.values_pos_pl_queen = [
+        self.pos_pl_queen = [
             [20, 25, 25, 30, 30, 25, 25, 20],
             [17, 20, 25, 27, 27, 25, 20, 17],
             [15, 18, 20, 25, 25, 20, 18, 15],
@@ -110,7 +110,7 @@ class Board:
             [ 7, 10, 15, 20, 20, 15, 10,  7]
         ]
 
-        self.values_pos_pl_rook = [
+        self.pos_pl_rook = [
             [20, 25, 25, 30, 30, 25, 25, 20],
             [17, 20, 25, 27, 27, 25, 20, 17],
             [15, 18, 20, 25, 25, 20, 18, 15],
@@ -121,7 +121,7 @@ class Board:
             [ 7, 10, 15, 20, 20, 15, 10,  7]
         ]
 
-        self.values_pos_pl_bishop = [
+        self.pos_pl_bishop = [
             [14, 14, 14, 14, 14, 14, 14, 14],
             [14, 22, 18, 18, 18, 18, 22, 14],
             [14, 18, 22, 22, 22, 22, 18, 14],
@@ -132,7 +132,7 @@ class Board:
             [14, 14, 14, 14, 14, 14, 14, 14]
         ]
 
-        self.values_pos_pl_knight = [
+        self.pos_pl_knight = [
             [ 0,  4,  8, 10, 10,  8,  4,  0],
             [ 4,  8, 16, 20, 20, 16,  8,  4],
             [ 8, 16, 24, 28, 28, 24, 16,  8],
@@ -143,7 +143,7 @@ class Board:
             [ 0,  4,  8, 10, 10,  8,  4,  0]
         ]
 
-        self.values_pos_pl_pawn = [
+        self.pos_pl_pawn = [
             [20, 20, 28, 35, 35, 28, 20, 20],
             [12, 16, 24, 32, 32, 24, 16, 12],
             [12, 16, 24, 32, 32, 24, 16, 12],
@@ -160,31 +160,54 @@ class Board:
                 result.append(line)
             return result
 
-        self.values_pos_cmp_king = create_cmp_pos_table(self.values_pos_pl_king)
-        self.values_pos_cmp_queen = create_cmp_pos_table(self.values_pos_pl_queen)
-        self.values_pos_cmp_rook = create_cmp_pos_table(self.values_pos_pl_rook)
-        self.values_pos_cmp_bishop = create_cmp_pos_table(self.values_pos_pl_bishop)
-        self.values_pos_cmp_knight = create_cmp_pos_table(self.values_pos_pl_knight)
-        self.values_pos_cmp_pawn = create_cmp_pos_table(self.values_pos_pl_pawn)
+        self.pos_cmp_king = create_cmp_pos_table(self.pos_pl_king)
+        self.pos_cmp_queen = create_cmp_pos_table(self.pos_pl_queen)
+        self.pos_cmp_rook = create_cmp_pos_table(self.pos_pl_rook)
+        self.pos_cmp_bishop = create_cmp_pos_table(self.pos_pl_bishop)
+        self.pos_cmp_knight = create_cmp_pos_table(self.pos_pl_knight)
+        self.pos_cmp_pawn = create_cmp_pos_table(self.pos_pl_pawn)
+
+        # Подготавливаем вспомогательные словари для быстрого поиска таблиц оценки позиции
+        self.pos_pl_dict = {}
+        self.pos_pl_dict[Pawn] = self.pos_pl_pawn
+        self.pos_pl_dict[Knight] = self.pos_pl_knight
+        self.pos_pl_dict[Bishop] = self.pos_pl_bishop
+        self.pos_pl_dict[Rook] = self.pos_pl_rook
+        self.pos_pl_dict[Queen] = self.pos_pl_queen
+        self.pos_pl_dict[King] = self.pos_pl_king
+
+        self.pos_cmp_dict = {}
+        self.pos_cmp_dict[Pawn] = self.pos_cmp_pawn
+        self.pos_cmp_dict[Knight] = self.pos_cmp_knight
+        self.pos_cmp_dict[Bishop] = self.pos_cmp_bishop
+        self.pos_cmp_dict[Rook] = self.pos_cmp_rook
+        self.pos_cmp_dict[Queen] = self.pos_cmp_queen
+        self.pos_cmp_dict[King] = self.pos_cmp_king
 
     # Метод возвращает оценку позиции на доске с точки зрения компьютера
     def position_evaluation(self):
-        # Получаем стоимость фигур компьютера
-        cmp_eval = 0
+        # Получаем оценку фигур компьютера
+        value_cmp_eval = 0
+        pos_cmp_eval = 0
         for figure in self.cmp_figures:
             if figure.is_drop:
                 continue
-            cmp_eval += self.values_figure[type(figure)]
+            figure_type = type(figure)
+            value_cmp_eval += self.values_figure[figure_type]
+            pos_cmp_eval += self.pos_cmp_dict[figure_type][figure.row][figure.col]
 
-        # получаем стоимость фигур игрока
-        pl_eval = 0
+        # Получаем оценку фигур игрока
+        value_pl_eval = 0
+        pos_pl_eval = 0
         for figure in self.pl_figures:
             if figure.is_drop:
                 continue
-            pl_eval += self.values_figure[type(figure)]
+            figure_type = type(figure)
+            value_pl_eval += self.values_figure[type(figure)]
+            pos_pl_eval += self.pos_pl_dict[figure_type][figure.row][figure.col]
 
         # Возвращаем оценку позиции
-        return cmp_eval - pl_eval
+        return (value_cmp_eval + pos_cmp_eval) - (value_pl_eval + pos_pl_eval)
 
     # Метод возвращает количество сделанных ходов
     def get_moves_count(self):
