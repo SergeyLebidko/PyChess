@@ -107,7 +107,7 @@ class Board:
             [11, 15, 19, 21, 21, 19, 15, 11],
             [10, 15, 17, 19, 19, 17, 15, 10],
             [ 8, 12, 15, 15, 15, 15, 12,  8],
-            [ 7, 10, 15, 20, 20, 15, 10,  7],
+            [ 7, 10, 15, 20, 20, 15, 10,  7]
         ]
 
         self.values_pos_pl_rook = [
@@ -118,7 +118,7 @@ class Board:
             [11, 15, 19, 21, 21, 19, 15, 11],
             [10, 15, 17, 19, 19, 17, 15, 10],
             [ 8, 12, 15, 15, 15, 15, 12,  8],
-            [ 7, 10, 15, 20, 20, 15, 10,  7],
+            [ 7, 10, 15, 20, 20, 15, 10,  7]
         ]
 
         self.values_pos_pl_bishop = [
@@ -133,7 +133,7 @@ class Board:
         ]
 
         self.values_pos_pl_knight = [
-            [ 0,  4,  8, 10, 10,  8,  4,  0]
+            [ 0,  4,  8, 10, 10,  8,  4,  0],
             [ 4,  8, 16, 20, 20, 16,  8,  4],
             [ 8, 16, 24, 28, 28, 24, 16,  8],
             [10, 20, 28, 32, 32, 28, 20, 10],
@@ -151,10 +151,21 @@ class Board:
             [ 6,  8, 12, 16, 16, 12,  8,  6],
             [ 6,  8,  8, 12, 12,  8,  8,  6],
             [ 4,  4,  4,  6,  6,  4,  4,  4],
-            [ 0,  0,  0,  0,  0,  0,  0,  0],
+            [ 0,  0,  0,  0,  0,  0,  0,  0]
         ]
 
+        def create_cmp_pos_table(source_table):
+            result = []
+            for line in reversed(source_table):
+                result.append(line)
+            return result
 
+        self.values_pos_cmp_king = create_cmp_pos_table(self.values_pos_pl_king)
+        self.values_pos_cmp_queen = create_cmp_pos_table(self.values_pos_pl_queen)
+        self.values_pos_cmp_rook = create_cmp_pos_table(self.values_pos_pl_rook)
+        self.values_pos_cmp_bishop = create_cmp_pos_table(self.values_pos_pl_bishop)
+        self.values_pos_cmp_knight = create_cmp_pos_table(self.values_pos_pl_knight)
+        self.values_pos_cmp_pawn = create_cmp_pos_table(self.values_pos_pl_pawn)
 
     # Метод возвращает оценку позиции на доске с точки зрения компьютера
     def position_evaluation(self):
