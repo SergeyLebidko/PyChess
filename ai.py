@@ -25,17 +25,18 @@ class Ai:
         # Иначе нам нужно выбрать ход с максимальной оценкой
         max_rating = -sys.maxsize
         move_with_max_rating = random_move
+        d = 2
 
         # Глубину перебора выбираем относительно количества фигур
-        count_figures = self.board.get_figures_count()
-        if count_figures <= 32:
-            d = 2
-        if count_figures <= 16:
-            d = 3
-        if count_figures <= 8:
-            d = 4
-
-        print('Глубина перебора: ', d)
+        # count_figures = self.board.get_figures_count()
+        # if count_figures <= 32:
+        #     d = 2
+        # if count_figures <= 16:
+        #     d = 3
+        # if count_figures <= 8:
+        #     d = 4
+        #
+        # print('Глубина перебора: ', d)
 
         for move in avl_moves:
             if move.m_type == CONVERSION:
@@ -65,7 +66,7 @@ class Ai:
             min_rating = sys.maxsize
             for avl_move in avl_moves:
                 if avl_move.m_type == CONVERSION:
-                    avl_move.new_figure = Queen(avl_move.figure.new_row, avl_move.figure.new_col, op_side, self.board)
+                    avl_move.new_figure = Queen(avl_move.new_row, avl_move.new_col, op_side, self.board)
                 self.board.apply_move(avl_move)
                 rating = self.get_rating(d - 1, 'min', op_side, min_rating)
                 self.board.cancel_move()
@@ -78,7 +79,7 @@ class Ai:
             max_rating = -sys.maxsize
             for avl_move in avl_moves:
                 if avl_move.m_type == CONVERSION:
-                    avl_move.new_figure = Queen(avl_move.figure.new_row, avl_move.figure.new_col, op_side, self.board)
+                    avl_move.new_figure = Queen(avl_move.new_row, avl_move.new_col, op_side, self.board)
                 self.board.apply_move(avl_move)
                 rating = self.get_rating(d - 1, 'max', op_side, max_rating)
                 self.board.cancel_move()

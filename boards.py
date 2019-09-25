@@ -196,25 +196,66 @@ class Board:
         # Получаем оценку фигур компьютера
         value_cmp_eval = 0
         pos_cmp_eval = 0
+        actions_cmp_eval = 0
         for figure in self.cmp_figures:
             if figure.is_drop:
                 continue
             figure_type = type(figure)
+            # Получаем оценку по весу фигуры
             value_cmp_eval += self.values_figure[figure_type]
+
+            # Получаем оценку по позиции фигруы на доске
             pos_cmp_eval += self.pos_cmp_dict[figure_type][figure.row][figure.col] * 5
+
+            # Получаем оценку по защите и нападению
+            if figure_type == King:
+                continue
+            if figure_type == Pawn:
+                actions = figure.get_actions(PAWN_TAKES)
+            else:
+                actions = figure.get_actions()
+            for row, col in actions:
+                figure_on_action = self.get_figure(row, col)
+                if figure_on_action is None:
+                    continue
+                if figure_on_action is self.cmp_king:
+                    continue
+                figure_on_action_type = type(figure_on_action)
+                actions_cmp_eval += self.values_figure[figure_on_action_type] // 40
 
         # Получаем оценку фигур игрока
         value_pl_eval = 0
         pos_pl_eval = 0
+        actions_pl_eval = 0
         for figure in self.pl_figures:
             if figure.is_drop:
                 continue
             figure_type = type(figure)
+
+            # Получаем оценку по весу фигуры
             value_pl_eval += self.values_figure[type(figure)]
+
+            # Получаем оценку по позиции фигуры на доске
             pos_pl_eval += self.pos_pl_dict[figure_type][figure.row][figure.col] * 5
 
+            # Получаем оценку по защите и нападению
+            if figure_type == King:
+                continue
+            if figure_type == Pawn:
+                actions = figure.get_actions(PAWN_TAKES)
+            else:
+                actions = figure.get_actions()
+            for row, col in actions:
+                figure_on_action = self.get_figure(row, col)
+                if figure_on_action is None:
+                    continue
+                if figure_on_action is self.pl_king:
+                    continue
+                figure_on_action_type = type(figure_on_action)
+                actions_pl_eval += self.values_figure[figure_on_action_type] // 40
+
         # Возвращаем оценку позиции
-        return (value_cmp_eval + pos_cmp_eval) - (value_pl_eval + pos_pl_eval)
+        return (value_cmp_eval + pos_cmp_eval + actions_cmp_eval) - (value_pl_eval + pos_pl_eval + actions_pl_eval)
 
     # Метод возвращает количество сделанных ходов
     def get_moves_count(self):
