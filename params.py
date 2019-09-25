@@ -38,6 +38,15 @@ CASTLING = 'castling'        # Рокировка
 CONVERSION = 'conversion'    # Превращение пешки в другую фигуру
 PASSED_TAKE = 'passed_take'  # Взятие на проходе
 
+# Приоритеты ходов
+priority_list = [TAKE_MOVE, CONVERSION, PASSED_TAKE, CASTLING, NORMAL_MOVE]
+
+
+# Функция-ключ для сортировки ходов
+def key_func_for_moves(move):
+    return priority_list.index(move.m_type, 0, 5)
+
+
 # Варианты завершения игры
-MAT = 'mat'                  # Игра завершилась матом
-PAT = 'pat'                  # Игра завершилась патом
+MAT = 'mat'  # Игра завершилась матом
+PAT = 'pat'  # Игра завершилась патом

@@ -257,6 +257,9 @@ class Board:
             avl_moves = self.get_avl_moves_for_figure(figure)
             result += avl_moves
 
+        # Сортируем ходы по возрастанию приоритета
+        result.sort(key=key_func_for_moves)
+
         # Возвращаем результат
         return result
 
