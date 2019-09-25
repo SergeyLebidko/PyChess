@@ -27,20 +27,9 @@ class Ai:
         move_with_max_rating = random_move
         d = 2
 
-        # Глубину перебора выбираем относительно количества фигур
-        # count_figures = self.board.get_figures_count()
-        # if count_figures <= 32:
-        #     d = 2
-        # if count_figures <= 16:
-        #     d = 3
-        # if count_figures <= 8:
-        #     d = 4
-        #
-        # print('Глубина перебора: ', d)
-
         for move in avl_moves:
             if move.m_type == CONVERSION:
-                move.new_figure = Queen(move.figure.new_row, move.figure.new_col, self.side, self.board)
+                move.new_figure = Queen(move.new_row, move.new_col, self.side, self.board)
             self.board.apply_move(move)
             rating = self.get_rating(d, 'max', self.side, max_rating)
             self.board.cancel_move()
