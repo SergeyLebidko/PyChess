@@ -556,10 +556,6 @@ class Board:
     # Метод возвращает фигуру, стоящую на клетке r, c
     def get_figure(self, r, c):
         return self.cells[r][c]
-        # for figure in (self.pl_figures + self.cmp_figures):
-        #     if figure.row == r and figure.col == c and not figure.is_drop:
-        #         return figure
-        # return None
 
 
 class SelectorBoard:
