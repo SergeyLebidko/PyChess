@@ -74,6 +74,13 @@ class Board:
         for i in range(0, 8):
             self.pl_figures.append(Pawn(6, i, self.pl_side, self))
 
+        # Создаем клетки поля
+        self.cells = []
+        for i in range(0, 8):
+            self.cells.append([None] * 8)
+        for figure in (self.cmp_figures + self.pl_figures):
+            self.cells[figure.row][figure.col] = figure
+
         # Создаем список сделанных во время игры ходов
         self.move_list = []
 
@@ -91,10 +98,10 @@ class Board:
         self.pos_pl_king = [
             [25, 25, 21, 15, 15, 21, 25, 25],
             [21, 21, 17, 13, 13, 17, 21, 21],
-            [13, 13,  5,  5,  5,  5, 13, 13],
-            [ 9,  5,  0,  0,  0,  0,  5,  9],
-            [ 9,  5,  0,  0,  0,  0,  5,  9],
-            [13, 13,  5,  5,  5,  5, 13, 13],
+            [13, 13, 5, 5, 5, 5, 13, 13],
+            [9, 5, 0, 0, 0, 0, 5, 9],
+            [9, 5, 0, 0, 0, 0, 5, 9],
+            [13, 13, 5, 5, 5, 5, 13, 13],
             [21, 21, 17, 13, 13, 17, 21, 21],
             [25, 25, 21, 15, 15, 21, 25, 25]
         ]
@@ -106,8 +113,8 @@ class Board:
             [12, 15, 19, 21, 21, 19, 15, 12],
             [11, 15, 19, 21, 21, 19, 15, 11],
             [10, 15, 17, 19, 19, 17, 15, 10],
-            [ 8, 12, 15, 15, 15, 15, 12,  8],
-            [ 7, 10, 15, 20, 20, 15, 10,  7]
+            [8, 12, 15, 15, 15, 15, 12, 8],
+            [7, 10, 15, 20, 20, 15, 10, 7]
         ]
 
         self.pos_pl_rook = [
@@ -117,8 +124,8 @@ class Board:
             [12, 15, 19, 21, 21, 19, 15, 12],
             [11, 15, 19, 21, 21, 19, 15, 11],
             [10, 15, 17, 19, 19, 17, 15, 10],
-            [ 8, 12, 15, 15, 15, 15, 12,  8],
-            [ 7, 10, 15, 20, 20, 15, 10,  7]
+            [8, 12, 15, 15, 15, 15, 12, 8],
+            [7, 10, 15, 20, 20, 15, 10, 7]
         ]
 
         self.pos_pl_bishop = [
@@ -133,25 +140,25 @@ class Board:
         ]
 
         self.pos_pl_knight = [
-            [ 0,  4,  8, 10, 10,  8,  4,  0],
-            [ 4,  8, 16, 20, 20, 16,  8,  4],
-            [ 8, 16, 24, 28, 28, 24, 16,  8],
+            [0, 4, 8, 10, 10, 8, 4, 0],
+            [4, 8, 16, 20, 20, 16, 8, 4],
+            [8, 16, 24, 28, 28, 24, 16, 8],
             [10, 20, 28, 32, 32, 28, 20, 10],
             [10, 20, 28, 32, 32, 28, 20, 10],
-            [ 8, 16, 24, 28, 28, 24, 16,  8],
-            [ 4,  8, 16, 20, 20, 16,  8,  4],
-            [ 0,  4,  8, 10, 10,  8,  4,  0]
+            [8, 16, 24, 28, 28, 24, 16, 8],
+            [4, 8, 16, 20, 20, 16, 8, 4],
+            [0, 4, 8, 10, 10, 8, 4, 0]
         ]
 
         self.pos_pl_pawn = [
             [20, 20, 28, 35, 35, 28, 20, 20],
             [12, 16, 24, 32, 32, 24, 16, 12],
             [12, 16, 24, 32, 32, 24, 16, 12],
-            [ 8, 12, 16, 24, 24, 16, 12,  8],
-            [ 6,  8, 12, 16, 16, 12,  8,  6],
-            [ 6,  8,  8, 12, 12,  8,  8,  6],
-            [ 4,  4,  4,  6,  6,  4,  4,  4],
-            [ 0,  0,  0,  0,  0,  0,  0,  0]
+            [8, 12, 16, 24, 24, 16, 12, 8],
+            [6, 8, 12, 16, 16, 12, 8, 6],
+            [6, 8, 8, 12, 12, 8, 8, 6],
+            [4, 4, 4, 6, 6, 4, 4, 4],
+            [0, 0, 0, 0, 0, 0, 0, 0]
         ]
 
         def create_cmp_pos_table(source_table):
@@ -194,7 +201,7 @@ class Board:
                 continue
             figure_type = type(figure)
             value_cmp_eval += self.values_figure[figure_type]
-            pos_cmp_eval += self.pos_cmp_dict[figure_type][figure.row][figure.col]*5
+            pos_cmp_eval += self.pos_cmp_dict[figure_type][figure.row][figure.col] * 5
 
         # Получаем оценку фигур игрока
         value_pl_eval = 0
@@ -204,7 +211,7 @@ class Board:
                 continue
             figure_type = type(figure)
             value_pl_eval += self.values_figure[type(figure)]
-            pos_pl_eval += self.pos_pl_dict[figure_type][figure.row][figure.col]*5
+            pos_pl_eval += self.pos_pl_dict[figure_type][figure.row][figure.col] * 5
 
         # Возвращаем оценку позиции
         return (value_cmp_eval + pos_cmp_eval) - (value_pl_eval + pos_pl_eval)
@@ -423,12 +430,20 @@ class Board:
         # Обычный ход
         if move.m_type == NORMAL_MOVE:
             move.figure.set_pos(move.new_row, move.new_col)
+            # Перемещаем фигуру на доске
+            self.cells[move.old_row][move.old_col] = None
+            self.cells[move.new_row][move.new_col] = move.figure
             return
 
         # Ход-взятие или код-взятие на проходе (алгоритм их выполнения одинаков)
         if move.m_type == TAKE_MOVE or move.m_type == PASSED_TAKE:
             move.figure.set_pos(move.new_row, move.new_col)
             move.drop_figure.is_drop = True
+            # Удаляем фигуру, которую взяли с доски
+            self.cells[move.drop_figure.row][move.drop_figure.col] = None
+            # Перемещаем фигуру, которая выполнила взятие
+            self.cells[move.old_row][move.old_col] = None
+            self.cells[move.new_row][move.new_col] = move.figure
             return
 
         # Ход-конверсия
@@ -438,14 +453,22 @@ class Board:
             if move.drop_figure is not None:
                 move.drop_figure.is_drop = True
             self.figures_dict[move.new_figure.side].append(move.new_figure)
+            # Фигуру, которая переместилась надо просто удалить
+            self.cells[move.old_row][move.old_col] = None
+            # Удаленную фигуру заменит новая
+            self.cells[move.new_figure.row][move.new_figure.col] = move.new_figure
 
         # Рокировка
         if move.m_type == CASTLING:
             move.figure.set_pos(move.new_row, move.new_col)
             move.rook.set_pos(move.new_row_rook, move.new_col_rook)
+            # Перемещаем короля в новую позицию
+            self.cells[move.old_row][move.old_col] = None
+            self.cells[move.new_row][move.new_col] = move.figure
+            # Перемещаем ладью в новую позицию
+            self.cells[move.old_row_rook][move.old_col_rook] = None
+            self.cells[move.new_row_rook][move.new_col_rook] = move.rook
             return
-
-            # Метод откатывает последний ход из списка совершенных ходов
 
     # Метод производит откат последнего хода из списка ходов
     def cancel_move(self):
@@ -458,12 +481,20 @@ class Board:
         # Если откатываем обычный ход
         if last_move.m_type == NORMAL_MOVE:
             last_move.figure.set_pos(last_move.old_row, last_move.old_col)
+            # Перемещаем фигуру на старое место
+            self.cells[last_move.new_row][last_move.new_col] = None
+            self.cells[last_move.old_row][last_move.old_col] = last_move.figure
             return
 
         # Если откатываем ход-взятие или ход-взятие на проходе
         if last_move.m_type == TAKE_MOVE or last_move.m_type == PASSED_TAKE:
             last_move.figure.set_pos(last_move.old_row, last_move.old_col)
             last_move.drop_figure.is_drop = False
+            # Перемещаем фигуру на старое место
+            self.cells[last_move.new_row][last_move.new_col] = None
+            self.cells[last_move.old_row][last_move.old_col] = last_move.figure
+            # Удаленную фигуру возвращаем на доску
+            self.cells[last_move.drop_figure.row][last_move.drop_figure.col] = last_move.drop_figure
             return
 
         # Если откатываем ход-конверсию
@@ -474,12 +505,23 @@ class Board:
                 last_move.drop_figure.is_drop = False
             work_list = self.figures_dict[last_move.new_figure.side]
             work_list.remove(last_move.new_figure)
+            # Возвращаем на место пешку
+            self.cells[last_move.old_row][last_move.old_col] = last_move.figure
+            # Возвращаем на место фигуру, которая была удалена
+            if last_move.drop_figure is not None:
+                self.cells[last_move.drop_figure.row][last_move.drop_figure.col] = last_move.drop_figure
             return
 
         # Если откатываем рокировку
         if last_move.m_type == CASTLING:
             last_move.figure.set_pos(last_move.old_row, last_move.old_col)
             last_move.rook.set_pos(last_move.old_row_rook, last_move.old_col_rook)
+            # Возвращаем на место короля
+            self.cells[last_move.new_row][last_move.new_col] = None
+            self.cells[last_move.old_row][last_move.old_col] = last_move.figure
+            # Возвращаем на место ладью
+            self.cells[last_move.new_row_rook][last_move.new_row_rook] = None
+            self.cells[last_move.old_row_rook][last_move.old_col_rook] = last_move.rook
             return
 
     # Метод возвращает True, если поле (row, col) находится под ударом фигур стороны side
@@ -512,10 +554,11 @@ class Board:
 
     # Метод возвращает фигуру, стоящую на клетке r, c
     def get_figure(self, r, c):
-        for figure in (self.pl_figures + self.cmp_figures):
-            if figure.row == r and figure.col == c and not figure.is_drop:
-                return figure
-        return None
+        return self.cells[r][c]
+        # for figure in (self.pl_figures + self.cmp_figures):
+        #     if figure.row == r and figure.col == c and not figure.is_drop:
+        #         return figure
+        # return None
 
 
 class SelectorBoard:
