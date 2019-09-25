@@ -1,6 +1,5 @@
-from boards import *
-from params import *
-from ai import *
+from game_pack.boards import *
+from game_pack.ai import *
 
 # Текущий холст
 surface = None

@@ -1,4 +1,4 @@
-from figures import *
+from game_pack.figures import *
 
 
 class Move:

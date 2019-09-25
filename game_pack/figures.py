@@ -1,5 +1,5 @@
 import pygame
-from params import *
+from game_pack.params import *
 
 
 class Figure(pygame.sprite.Sprite):

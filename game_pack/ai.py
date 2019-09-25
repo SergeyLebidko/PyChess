@@ -1,5 +1,5 @@
 import random
-from figures import *
+from game_pack.figures import *
 import sys
 
 
