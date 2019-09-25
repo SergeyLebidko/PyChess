@@ -506,6 +506,7 @@ class Board:
             work_list = self.figures_dict[last_move.new_figure.side]
             work_list.remove(last_move.new_figure)
             # Возвращаем на место пешку
+            self.cells[last_move.new_row][last_move.new_col] = None
             self.cells[last_move.old_row][last_move.old_col] = last_move.figure
             # Возвращаем на место фигуру, которая была удалена
             if last_move.drop_figure is not None:
@@ -520,7 +521,7 @@ class Board:
             self.cells[last_move.new_row][last_move.new_col] = None
             self.cells[last_move.old_row][last_move.old_col] = last_move.figure
             # Возвращаем на место ладью
-            self.cells[last_move.new_row_rook][last_move.new_row_rook] = None
+            self.cells[last_move.new_row_rook][last_move.new_col_rook] = None
             self.cells[last_move.old_row_rook][last_move.old_col_rook] = last_move.rook
             return
 
