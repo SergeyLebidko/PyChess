@@ -25,11 +25,23 @@ class Ai:
         # Иначе нам нужно выбрать ход с максимальной оценкой
         max_rating = -sys.maxsize
         move_with_max_rating = random_move
+
+        # Глубину перебора выбираем относительно количества фигур
+        count_figures = self.board.get_figures_count()
+        if count_figures <= 32:
+            d = 2
+        if count_figures <= 16:
+            d = 3
+        if count_figures <= 8:
+            d = 4
+
+        print('Глубина перебора: ', d)
+
         for move in avl_moves:
             if move.m_type == CONVERSION:
                 move.new_figure = Queen(move.figure.new_row, move.figure.new_col, self.side, self.board)
             self.board.apply_move(move)
-            rating = self.get_rating(2, 'max', self.side, max_rating)
+            rating = self.get_rating(d, 'max', self.side, max_rating)
             self.board.cancel_move()
             if rating > max_rating:
                 max_rating = rating

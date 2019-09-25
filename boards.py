@@ -220,6 +220,14 @@ class Board:
     def get_moves_count(self):
         return len(self.move_list)
 
+    # Метод возвращает количество фигур на доске
+    def get_figures_count(self):
+        count = 0
+        for figure in (self.pl_figures + self.cmp_figures):
+            if not figure.is_drop:
+                count += 1
+        return count
+
     # Метод возвращает все доступные ходы для выбранных фигур (белых или черных)
     def get_all_avl_moves(self, side):
         # Определяем набор фигур, для которого будем получать доступные ходы
