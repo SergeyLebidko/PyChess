@@ -51,6 +51,12 @@ class Ai:
         op_side = OPPOSITE_SIDE[side]
         avl_moves = self.board.get_all_avl_moves(op_side)
 
+        # Обрабатываем особую ситуацию: нет доступных ходов, но король не находится под шахом
+        # Это означает ничью и оценка позиции при этом равна 0
+        if len(avl_moves) == 0:
+            if not self.board.is_strike_figure(self.board.kings_dict[op_side]):
+                return 0
+
         if option == 'max':
             min_rating = sys.maxsize
             for avl_move in avl_moves:
