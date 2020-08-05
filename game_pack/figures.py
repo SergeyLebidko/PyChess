@@ -1,3 +1,4 @@
+import os
 import pygame
 from game_pack.params import *
 
@@ -6,7 +7,7 @@ class Figure(pygame.sprite.Sprite):
 
     def __init__(self, filename, r, c, side, board):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(filename).convert_alpha()
+        self.image = pygame.image.load(os.path.dirname(__file__) + '/' + filename).convert_alpha()
         self.rect = self.image.get_rect(topleft=(c * CELL_SIZE, r * CELL_SIZE))
         self.row = r
         self.col = c
