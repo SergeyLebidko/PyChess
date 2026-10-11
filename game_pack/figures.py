@@ -2,12 +2,37 @@ import os
 import pygame
 from game_pack.params import *
 
+# Кэш загруженных изображений фигур.
+# Изображения статичны, поэтому каждое грузится и масштабируется лишь один раз,
+# а не при создании каждой фигуры. Это важно для производительности: объекты
+# фигур активно создаются в процессе поиска хода компьютером (например,
+# "фиктивный ферзь" для ходов-превращений).
+_images_cache = {}
+
+
+def get_figure_image(filename):
+    """Возвращает готовое к отрисовке изображение фигуры нужного размера,
+    загружая его при первом обращении и переиспользуя в дальнейшем."""
+    image = _images_cache.get(filename)
+    if image is not None:
+        return image
+
+    path = os.path.join(os.path.dirname(__file__), filename)
+    image = pygame.image.load(path).convert_alpha()
+
+    # Приводим изображение к размеру клетки (на случай, если исходник крупнее)
+    if image.get_size() != (CELL_SIZE, CELL_SIZE):
+        image = pygame.transform.smoothscale(image, (CELL_SIZE, CELL_SIZE))
+
+    _images_cache[filename] = image
+    return image
+
 
 class Figure(pygame.sprite.Sprite):
 
     def __init__(self, filename, r, c, side, board):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(os.path.dirname(__file__) + '/' + filename).convert_alpha()
+        self.image = get_figure_image(filename)
         self.rect = self.image.get_rect(topleft=(c * CELL_SIZE, r * CELL_SIZE))
         self.row = r
         self.col = c

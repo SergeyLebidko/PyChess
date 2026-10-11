@@ -1,5 +1,11 @@
 from game_pack.figures import *
 
+# Направления движения фигур, используемые при проверке удара по клетке
+_STRAIGHT_DIRS = ((-1, 0), (0, 1), (1, 0), (0, -1))
+_DIAG_DIRS = ((-1, 1), (1, 1), (1, -1), (-1, -1))
+_KING_OFFSETS = _STRAIGHT_DIRS + _DIAG_DIRS
+_KNIGHT_OFFSETS = ((-2, 1), (-1, 2), (1, 2), (2, 1), (2, -1), (1, -2), (-1, -2), (-2, -1))
+
 
 class Move:
 
@@ -191,46 +197,54 @@ class Board:
         self.pos_cmp_dict[Queen] = self.pos_cmp_queen
         self.pos_cmp_dict[King] = self.pos_cmp_king
 
-    # Метод возвращает оценку позиции на доске с точки зрения компьютера
-    def position_evaluation(self):
+    # Метод возвращает оценку позиции на доске с точки зрения компьютера.
+    # Если передан side, оценка возвращается с точки зрения этой стороны.
+    def position_evaluation(self, side=None):
+        values = self.values_figure
+        pos = self.pos_cmp_dict
+        cells = self.cells
 
-        def get_evals(side):
-            work_list = self.figures_dict[side]
-            king = self.kings_dict[side]
+        def get_evals(work_side, king):
             value_eval = 0
             pos_eval = 0
             actions_eval = 0
-            for figure in work_list:
-                if figure.is_drop:
-                    continue
-                figure_type = type(figure)
-                # Получаем оценку по весу фигуры
-                value_eval += self.values_figure[figure_type]
-
-                # Получаем оценку по позиции фигруы на доске
-                pos_eval += self.pos_cmp_dict[figure_type][figure.row][figure.col] * 5
-
-                # Получаем оценку по защите и нападению
-                if figure_type == King:
-                    continue
-                if figure_type == Pawn:
-                    actions = figure.get_actions(PAWN_TAKES)
-                else:
-                    actions = figure.get_actions()
-                for row, col in actions:
-                    figure_on_action = self.get_figure(row, col)
-                    if figure_on_action is None:
+            for row in range(8):
+                row_cells = cells[row]
+                for col in range(8):
+                    figure = row_cells[col]
+                    if figure is None or figure.side != work_side:
                         continue
-                    if figure_on_action is king:
+                    figure_type = type(figure)
+                    # Получаем оценку по весу фигуры
+                    value_eval += values[figure_type]
+
+                    # Получаем оценку по позиции фигуры на доске
+                    pos_eval += pos[figure_type][row][col] * 5
+
+                    # Получаем оценку по защите и нападению
+                    if figure_type == King:
                         continue
-                    figure_on_action_type = type(figure_on_action)
-                    actions_eval += self.values_figure[figure_on_action_type] // 40
+                    if figure_type == Pawn:
+                        actions = figure.get_actions(PAWN_TAKES)
+                    else:
+                        actions = figure.get_actions()
+                    for r, c in actions:
+                        figure_on_action = cells[r][c]
+                        if figure_on_action is None or figure_on_action is king:
+                            continue
+                        actions_eval += values[type(figure_on_action)] // 40
 
             # Возвращаем результат
             return value_eval + pos_eval + actions_eval
 
-        # Возвращаем результат
-        return get_evals(self.cmp_side) - get_evals(self.pl_side)
+        # Оценка с точки зрения компьютера
+        score = (get_evals(self.cmp_side, self.kings_dict[self.cmp_side])
+                 - get_evals(self.pl_side, self.kings_dict[self.pl_side]))
+
+        # При необходимости разворачиваем оценку для запрошенной стороны
+        if side is None or side == self.cmp_side:
+            return score
+        return -score
 
     # Метод возвращает количество сделанных ходов
     def get_moves_count(self):
@@ -448,6 +462,13 @@ class Board:
         # Возвращаем созданнй ход
         return move
 
+    # Метод подготавливает ход к применению: для хода-превращения создает
+    # фигуру, которой заменяется пешка (если она еще не создана)
+    def prepare_move(self, move, side):
+        if move.m_type == CONVERSION and move.new_figure is None:
+            move.new_figure = Queen(move.new_row, move.new_col, side, self)
+        return move
+
     # Метод применяет переданный ход и вносит его в список совершенных ходов
     def apply_move(self, move):
         # Вносим применяемый ход в список ходов
@@ -553,19 +574,72 @@ class Board:
             return
 
     # Метод возвращает True, если поле (row, col) находится под ударом фигур стороны side
+    # Проверка ведется "наружу" от целевой клетки, поэтому занимает постоянное
+    # время и не зависит от числа фигур на доске (в отличие от перебора всех
+    # фигур соперника). Это важно, так как метод вызывается для каждого
+    # рассматриваемого хода при фильтрации ходов, ведущих к шаху.
     def is_strike_cell(self, row, col, side):
-        work_list = self.figures_dict[side]
-        for figure in work_list:
-            if figure.is_drop:
-                continue
-            figure_type = type(figure)
-            if figure_type == Pawn:
-                actions = figure.get_actions(PAWN_TAKES)
-            else:
-                actions = figure.get_actions()
-            for r, c in actions:
-                if r == row and c == col:
+        cells = self.cells
+
+        # Удар коня
+        for dr, dc in _KNIGHT_OFFSETS:
+            r = row + dr
+            c = col + dc
+            if Figure.is_valid_pos(r, c):
+                figure = cells[r][c]
+                if (figure is not None and not figure.is_drop and figure.side == side
+                        and type(figure) == Knight):
                     return True
+
+        # Удар короля
+        for dr, dc in _KING_OFFSETS:
+            r = row + dr
+            c = col + dc
+            if Figure.is_valid_pos(r, c):
+                figure = cells[r][c]
+                if (figure is not None and not figure.is_drop and figure.side == side
+                        and type(figure) == King):
+                    return True
+
+        # Удар пешки: пешка атакует по диагонали в направлении своего движения,
+        # поэтому пешка, бьющая клетку (row, col), стоит на строке row - direction
+        for dr in (-1, 1):
+            r = row - dr
+            for dc in (-1, 1):
+                c = col + dc
+                if Figure.is_valid_pos(r, c):
+                    figure = cells[r][c]
+                    if (figure is not None and not figure.is_drop and figure.side == side
+                            and type(figure) == Pawn and figure.direction == dr):
+                        return True
+
+        # Удар дальнобойных фигур по прямым (ладья, ферзь)
+        for dr, dc in _STRAIGHT_DIRS:
+            r = row + dr
+            c = col + dc
+            while Figure.is_valid_pos(r, c):
+                figure = cells[r][c]
+                if figure is not None:
+                    if (not figure.is_drop and figure.side == side
+                            and (type(figure) == Rook or type(figure) == Queen)):
+                        return True
+                    break
+                r += dr
+                c += dc
+
+        # Удар дальнобойных фигур по диагоналям (слон, ферзь)
+        for dr, dc in _DIAG_DIRS:
+            r = row + dr
+            c = col + dc
+            while Figure.is_valid_pos(r, c):
+                figure = cells[r][c]
+                if figure is not None:
+                    if (not figure.is_drop and figure.side == side
+                            and (type(figure) == Bishop or type(figure) == Queen)):
+                        return True
+                    break
+                r += dr
+                c += dc
 
         return False
 
